@@ -1,0 +1,140 @@
+/* Demo-only styles. The pie menu itself needs none of this. */
+
+.character-head {
+  --look-x: var(--pie-aim-x, 0);
+  --look-y: var(--pie-aim-y, 0);
+  --character-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.character-head :is(.character-head__skull, .character-head__face, .character-head__pupils, .character-head__fringe, .character-head__brows) {
+  transform-box: view-box;
+}
+
+/* Layers move by different amounts, so the head seems to turn in 3D. */
+.character-head__skull {
+  transform-origin: 50px 92px;
+  rotate: calc(var(--look-x) * 7deg);
+  translate: calc(var(--look-x) * 1.5px) 0;
+  transition: rotate 380ms var(--character-ease), translate 380ms var(--character-ease);
+}
+
+.character-head__face {
+  translate: calc(var(--look-x) * 7px) calc(var(--look-y) * 5px);
+  transition: translate 260ms var(--character-ease);
+}
+
+.character-head__pupils {
+  translate: calc(var(--look-x) * 2.2px) calc(var(--look-y) * 2.4px);
+  transition: translate 160ms var(--character-ease);
+}
+
+.character-head__fringe {
+  translate: calc(var(--look-x) * 3.5px) calc(var(--look-y) * 1.5px);
+  transition: translate 320ms var(--character-ease);
+}
+
+.character-head__brows {
+  transition: translate 200ms var(--character-ease);
+}
+
+.character-head__lids {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  scale: 1 0;
+  animation: character-blink 5.2s infinite;
+}
+
+.character-head__smile-wide {
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.character-head__smile {
+  transition: opacity 160ms ease-out;
+}
+
+/* The character perks up when an option is under the pointer. */
+[data-highlighting] .character-head__brows {
+  translate: 0 -2px;
+}
+
+[data-highlighting] .character-head__smile-wide {
+  opacity: 1;
+}
+
+[data-highlighting] .character-head__smile {
+  opacity: 0;
+}
+
+.thought-bubble {
+  animation: thought-bob 2.8s ease-in-out infinite;
+}
+
+.thought-bubble__dot {
+  animation: thought-dot 1.4s ease-in-out infinite;
+}
+
+.thought-bubble__dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.thought-bubble__dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+.queue-progress {
+  animation: queue-progress var(--duration, 2600ms) linear forwards;
+  transform-origin: left;
+}
+
+@keyframes character-blink {
+  0%,
+  93%,
+  100% {
+    scale: 1 0;
+  }
+  96% {
+    scale: 1 1;
+  }
+}
+
+@keyframes thought-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -3px;
+  }
+}
+
+@keyframes thought-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes queue-progress {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .character-head :is(.character-head__skull, .character-head__face, .character-head__pupils, .character-head__fringe, .character-head__brows) {
+    transition-duration: 0ms;
+  }
+  .character-head__lids,
+  .thought-bubble,
+  .thought-bubble__dot {
+    animation: none;
+  }
+}
