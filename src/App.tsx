@@ -1,6 +1,8 @@
 import type { ReactNode } from "react"
 import { Heart } from "lucide-react"
 
+import { Toaster } from "@/components/ui/sonner"
+import { AgentSetupButton } from "@/demo/agent-setup"
 import { ContextMenuDemo, ReactionDemo } from "@/demo/basic-demos"
 import { CodeBlock } from "@/demo/code-block"
 import { GitHubLink } from "@/demo/github-link"
@@ -37,6 +39,7 @@ export function App() {
       >
         Skip to content
       </a>
+      <Toaster />
 
       <main id="main" className="mx-auto max-w-5xl space-y-20 px-4 py-12 sm:px-6 sm:py-16">
         <header className="space-y-6">
@@ -52,7 +55,14 @@ export function App() {
             A radial menu for React, in the tradition of Don Hopkins&apos; pie menus. Every item is one short flick
             away. Press, drag toward an option, and let go. After a while, you do not need to look.
           </p>
-          <CodeBlock code="npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json" className="max-w-xl" />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <AgentSetupButton className="sm:self-stretch" />
+            <em className="text-center text-sm text-muted-foreground">or</em>
+            <CodeBlock
+              code="npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json"
+              className="min-w-0 flex-1"
+            />
+          </div>
           <nav aria-label="On this page">
             <ul className="flex flex-wrap gap-2">
               {NAV.map(({ href, label }) => (

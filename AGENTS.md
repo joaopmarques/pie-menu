@@ -128,6 +128,7 @@ The component is documented in many places, for people, for search engines, and 
 | `index.html` | The JSON-LD `SoftwareSourceCode` description and keywords, the `HowTo` steps, and the meta descriptions if the pitch changes. |
 | `src/demo/guide.tsx` | The "How it works" steps and the tables in them. |
 | `src/App.tsx` | The keyboard table, if a key binding changes. |
+| `src/demo/agent-setup.tsx` | `AGENT_SETUP_PROMPT`, the prompt that the "Agent setup" button copies. It names the requirements, the install command, and the parts. |
 | `AGENTS.md` | This file, including "How the component works". |
 | `public/r/` | Run `pnpm registry:build`, so installs get the new code. |
 | `public/og.png`, `public/media/` | Render them again if the look of the component changes (`pnpm media:og`, `pnpm media:video`). Then make the README WebP again. |
@@ -154,7 +155,13 @@ Check the facts against the code, not against other docs. The prop names live in
 - The maximalist demo uses 112px stickers on a ring with a radius of 176px. The disc size comes from `--pie-radius` in `maximalist.css`.
 - Keep the easter egg out of the public docs (README and llms files). It is a secret for visitors.
 - The maximalist demo has an easter egg. Move between Taco and Sushi three times, and "Antidepressant" appears between them while the menu is open. Its selection shows "The world needs more joy. Keep being awesome! ❤️". The demo counts switches with `onHighlight`. A different item resets the count. The same item again does not. A screen reader announcement tells users that a secret item appeared.
-- The header and the footer each have a GitHub link (`src/demo/github-link.tsx`), then the theme toggle.
+- The header and the footer each have a GitHub link (`src/demo/github-link.tsx`), then the theme toggle. The GitHub link opens in a new tab, shows an external-link icon, and tells screen readers "(opens in a new tab)".
+- The install row is: the emerald "Copy prompt for agent setup" button, an italic "or", and the install command, which fills the rest of the width. On phones, the three stack. The button is in `src/demo/agent-setup.tsx`.
+  - It copies a prompt for coding agents. The toast says "Setup prompt copied!" with the description "Paste it in your agent to setup Pie Menu automatically." The owner chose this wording, so keep it as it is.
+  - A failed copy shows an error toast.
+  - The button is `emerald-400`, the owner's chosen color, with `emerald-950` text (7.8:1). Hover is `emerald-300` and active is `emerald-500`. Never put white text on it: that gives 1.9:1.
+- Both copy buttons use `copyText` in `src/demo/clipboard.ts`. It tries the Clipboard API, then falls back to a hidden text area, because some frames block the API.
+- `src/components/ui/sonner.tsx` comes from the shadcn CLI, but it reads the theme from `src/demo/theme.ts` instead of `next-themes`. If you add Sonner again with the CLI, patch it the same way and do not install `next-themes`.
 - The theme toggle is in the header and the footer.
   - It shows the current mode and switches to the other one.
   - It follows the system until the user clicks. A click that matches the system clears the stored choice.

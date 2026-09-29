@@ -3,6 +3,8 @@ import { Check, Copy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+import { copyText } from "./clipboard"
+
 export function CodeBlock({ code, className }: { code: string; className?: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -13,12 +15,8 @@ export function CodeBlock({ code, className }: { code: string; className?: strin
   }, [copied])
 
   const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(code)
-      setCopied(true)
-    } catch {
-      // The clipboard can be blocked. The code stays selectable.
-    }
+    // If the copy fails, the code stays selectable.
+    if (await copyText(code)) setCopied(true)
   }
 
   return (
