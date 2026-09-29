@@ -149,6 +149,24 @@ describe("PieMenu", () => {
     expect(onSelect).toHaveBeenCalledWith("Up")
   })
 
+  it("highlights nothing when it opens from a pointer, even with an item under the pointer", () => {
+    const { trigger } = renderMenu()
+    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+
+    // On open, the items start stacked at the center, so the release can land on one of them.
+    const stacked = screen.getByRole("menuitem", { name: "Left" })
+    act(() => void stacked.dispatchEvent(pointer("pointerup", 201, 200)))
+    expect(screen.getByRole("menu")).toBeInTheDocument()
+    expect(document.querySelector("[data-highlighted]")).toBeNull()
+
+    act(() => void stacked.dispatchEvent(pointer("pointermove", 205, 203)))
+    expect(document.querySelector("[data-highlighted]")).toBeNull()
+
+    // Outside the dead zone, the item under the pointer counts again.
+    act(() => void stacked.dispatchEvent(pointer("pointermove", 120, 200)))
+    expect(stacked).toHaveAttribute("data-highlighted")
+  })
+
   it("cancels when the drag returns to the center", () => {
     const { trigger, onSelect, onOpenChange } = renderMenu()
     act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))

@@ -23,7 +23,7 @@ Pie Menu is a radial menu component for React. It ships as a shadcn/ui registry 
 | Command | Action |
 | --- | --- |
 | `pnpm dev` | Start the landing page on http://localhost:5173. |
-| `pnpm test` | Run the unit and interaction tests (29 tests). |
+| `pnpm test` | Run the unit and interaction tests (30 tests). |
 | `pnpm typecheck` | Type-check `src`. |
 | `pnpm build` | Type-check and build the site into `dist`. |
 | `pnpm registry:build` | Write the registry files to `public/r`. |
@@ -69,7 +69,9 @@ Before you finish any change, run `pnpm typecheck`, `pnpm test`, and `pnpm build
   - `sticky`: after a click in place, or after a keyboard open. The next click selects, or cancels in the center.
 - In `drag` mode, angles come from the press point. In `sticky` mode, angles come from the visual center.
 - A release re-reads the pointer position, so a fast flick with no move event still selects.
-- A pointer over an item element highlights that item, even when the menu was moved by the viewport fit.
+- The dead zone never highlights. A pointer open highlights nothing until the pointer leaves the center. A keyboard open highlights the first item.
+- Outside the dead zone, a pointer over an item element highlights that item, even when the menu was moved by the viewport fit.
+- Do not let the item under the pointer win inside the dead zone. On open, all items start stacked at the center, right under the pointer, so the release would land on one of them and highlight it. A regression test covers this.
 - `PieMenuItem` has `onHighlight`. The content calls it when the highlighted item changes to that item, from pointer or keyboard input.
 
 ### Live items

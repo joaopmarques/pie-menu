@@ -1,5 +1,7 @@
 # Pie Menu
 
+**Website, demo, and guide: [piemenu.jpmarqu.es](https://piemenu.jpmarqu.es)**
+
 A radial menu for React in the shadcn/ui style. Items sit in a ring around the pointer, so each one is a short flick away. The design follows the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986), and the marking menus of Gordon Kurtenbach and Bill Buxton.
 
 - Press, drag toward an item, and release. Or click, then click an item.
@@ -9,8 +11,6 @@ A radial menu for React in the shadcn/ui style. Items sit in a ring around the p
 - A headless primitive and a styled shadcn/ui layer, in separate files.
 - `onHighlight` on each item, for pointer and keyboard highlights.
 - Items can join while the menu is open. The ring re-flows, and the new item transitions in.
-
-Live demo and guide: https://piemenu.jpmarqu.es
 
 ## Install
 
@@ -162,6 +162,7 @@ Returns `{ x, y, angle, distance }` for the live aim, inside `PieMenuContent`. T
 | Press, drag out, release | Selects the item in that direction. |
 | Press, drag out, drag back to the center, release | Cancels. |
 | Click in place | Keeps the menu open. The next click selects, or cancels in the center. |
+| Open with a pointer | Nothing is highlighted until the pointer leaves the center. A keyboard open highlights the first item. |
 | Enter or Space on a press trigger | Opens the menu and focuses the first item. |
 | Arrow keys | Pick by direction. Hold two arrows for a diagonal. |
 | Tab, Shift+Tab | Walk around the ring. |
@@ -248,8 +249,14 @@ The parts are `Root`, `Trigger`, `Content`, `Item`, `Center`, and `Indicator`, p
 
 ## Demo
 
+The live demo is at [piemenu.jpmarqu.es](https://piemenu.jpmarqu.es). To run it on your machine:
+
 ```bash
-pnpm install
+git clone https://github.com/joaopmarques/pie-menu.git
+```
+
+```bash
+cd pie-menu && pnpm install
 ```
 
 ```bash

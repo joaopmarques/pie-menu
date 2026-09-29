@@ -473,9 +473,12 @@ function ContentImpl({
       const records = itemsRef.current
       const hovered = event.target instanceof Element ? event.target.closest("[data-pie-menu-item]") : null
       const hoveredItem = hovered ? records.find((item) => item.element === hovered) : undefined
+      // The dead zone never highlights. This matters on open: items start stacked at the
+      // center, right under the pointer, so the element under it can be an item.
       let next: ItemRecord | undefined
-      if (hoveredItem) next = hoveredItem
-      else if (distance > deadZone) next = records[wedgeIndex(vectorAngle(dx, dy), records.length, startRadians)]
+      if (distance > deadZone) {
+        next = hoveredItem ?? records[wedgeIndex(vectorAngle(dx, dy), records.length, startRadians)]
+      }
       highlight(next && !next.disabled ? next.id : null, "pointer")
       return distance
     }
