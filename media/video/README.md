@@ -59,3 +59,13 @@ Each frame shows a new moment in time. Frames repeat only while nothing moves on
 ## Change the motion
 
 Edit the `T` object and the `pointer()` function in `record.mjs`. `T` holds the times in seconds. `pointer()` returns the cursor position for a time. Keep the first and the last frame the same, so the video loops.
+
+## Make the README image
+
+The GitHub README cannot play the MP4 files. It shows an animated WebP instead. After each new recording, run this command from the project root:
+
+```bash
+ffmpeg -y -i public/media/pie-menu-demo-60fps.mp4 -vf "scale=960:-2:flags=lanczos" -c:v libwebp_anim -lossless 0 -q:v 80 -compression_level 6 -loop 0 -an public/media/pie-menu-demo.webp
+```
+
+The result is about 340 KB, 960x540, 60 fps, and it loops forever.

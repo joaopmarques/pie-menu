@@ -1,5 +1,7 @@
 # Pie Menu
 
+<a href="https://piemenu.jpmarqu.es"><img src="public/media/pie-menu-demo.webp" width="960" alt="Demo: a cursor opens a pie menu with Copy, Cut, Paste, Duplicate, Share, and Delete. It sweeps across the items, then picks Copy, and a Copied message shows."></a>
+
 **Website, demo, and guide: [piemenu.jpmarqu.es](https://piemenu.jpmarqu.es)**
 
 A radial menu for React in the shadcn/ui style. Items sit in a ring around the pointer, so each one is a short flick away. The design follows the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986), and the marking menus of Gordon Kurtenbach and Bill Buxton.

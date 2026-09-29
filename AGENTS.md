@@ -128,7 +128,7 @@ The component is documented in many places, for people, for search engines, and 
 | `src/App.tsx` | The keyboard table, if a key binding changes. |
 | `AGENTS.md` | This file, including "How the component works". |
 | `public/r/` | Run `pnpm registry:build`, so installs get the new code. |
-| `public/og.png`, `public/media/` | Render them again if the look of the component changes (`pnpm media:og`, `pnpm media:video`). |
+| `public/og.png`, `public/media/` | Render them again if the look of the component changes (`pnpm media:og`, `pnpm media:video`). Then make the README WebP again. |
 
 Check the facts against the code, not against other docs. The prop names live in `src/lib/pie-menu/primitive.tsx` and `src/components/ui/pie-menu.tsx`. Parse the JSON-LD with `JSON.parse` after you edit it.
 
@@ -167,6 +167,7 @@ Check the facts against the code, not against other docs. The prop names live in
 ## Media
 
 - `public/og.png` is 1200x630. It renders from real code in `media/og/`. Render it again when the domain, the tagline, or the component look changes. The script accepts `OG_URL`.
+- The GitHub README shows `public/media/pie-menu-demo.webp`, an animated WebP made from the 60 fps video. GitHub only plays `<video>` for files uploaded through its web editor, so the README uses an image. Make it again after every new recording, with the command in `media/video/README.md`.
 - The videos in `public/media/` are 1920x1080 at 120 fps and 60 fps, 8 seconds long, and they loop. The 60 fps copy is for X and LinkedIn, which cap playback at 60 fps. The poster is `public/media/pie-menu-demo-poster.jpg`.
 - The recorder uses a virtual clock:
   - It replaces the timers and `requestAnimationFrame`, and it seeks every Web Animation to the virtual time.
