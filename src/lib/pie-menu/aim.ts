@@ -36,7 +36,7 @@ type Listener = () => void
  * A tiny external store. Pointer moves arrive at display rate, so the menu
  * writes them here and to CSS variables instead of into React state.
  */
-export function createAimStore(onChange: (aim: Aim) => void) {
+export function createAimStore() {
   let aim = IDLE_AIM
   const listeners = new Set<Listener>()
   return {
@@ -44,12 +44,13 @@ export function createAimStore(onChange: (aim: Aim) => void) {
     set(next: Aim) {
       if (next.x === aim.x && next.y === aim.y) return
       aim = next
-      onChange(aim)
       listeners.forEach((listener) => listener())
     },
     subscribe(listener: Listener) {
       listeners.add(listener)
-      return () => listeners.delete(listener)
+      return () => {
+        listeners.delete(listener)
+      }
     },
   }
 }
@@ -60,7 +61,7 @@ export function useAimStore(store: AimStore | null) {
   return useSyncExternalStore(
     store?.subscribe ?? noopSubscribe,
     store?.get ?? getIdle,
-    getIdle,
+    getIdle
   )
 }
 

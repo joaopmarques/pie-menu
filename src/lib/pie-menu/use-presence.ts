@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, type RefObject } from "react"
+import { useEffect, useState, type RefObject } from "react"
 
 /**
  * - `starting`: first frame after mount. Styles show the enter start state.
@@ -13,18 +13,27 @@ export type PresenceStatus = "starting" | "entering" | "open" | "ending"
  * Base UI's `data-starting-style` and `data-ending-style`. It waits on the Web
  * Animations API, so it works with transitions and keyframes and needs no timers.
  */
-export function usePresence(present: boolean, ref: RefObject<HTMLElement | null>) {
+export function usePresence(
+  present: boolean,
+  ref: RefObject<HTMLElement | null>
+) {
   const [mounted, setMounted] = useState(present)
-  const [status, setStatus] = useState<PresenceStatus>(present ? "open" : "ending")
+  const [status, setStatus] = useState<PresenceStatus>(
+    present ? "starting" : "ending"
+  )
 
-  useLayoutEffect(() => {
+  // Adjust the state when the prop changes, during render. This is the React pattern
+  // for state that follows a prop, and it avoids an extra render from an effect.
+  const [previous, setPrevious] = useState(present)
+  if (present !== previous) {
+    setPrevious(present)
     if (present) {
       setMounted(true)
       setStatus("starting")
-    } else {
-      setStatus((current) => (current === "starting" ? current : "ending"))
+    } else if (status !== "starting") {
+      setStatus("ending")
     }
-  }, [present])
+  }
 
   useEffect(() => {
     if (!mounted) return
@@ -34,7 +43,9 @@ export function usePresence(present: boolean, ref: RefObject<HTMLElement | null>
     if (status === "starting") {
       // Two frames: the browser must paint the start state before it can transition from it.
       frame = requestAnimationFrame(() => {
-        frame = requestAnimationFrame(() => setStatus(present ? "entering" : "ending"))
+        frame = requestAnimationFrame(() =>
+          setStatus(present ? "entering" : "ending")
+        )
       })
     } else if (status === "entering" || status === "ending") {
       frame = requestAnimationFrame(() => {
@@ -56,10 +67,13 @@ export function usePresence(present: boolean, ref: RefObject<HTMLElement | null>
 }
 
 function waitForAnimations(element: HTMLElement | null) {
-  if (!element || typeof element.getAnimations !== "function") return Promise.resolve()
+  if (!element || typeof element.getAnimations !== "function")
+    return Promise.resolve()
   // Skip endless animations, such as a spinner inside the element. They never finish.
   const animations = element
     .getAnimations({ subtree: true })
-    .filter((animation) => animation.effect?.getComputedTiming().endTime !== Infinity)
+    .filter(
+      (animation) => animation.effect?.getComputedTiming().endTime !== Infinity
+    )
   return Promise.allSettled(animations.map((animation) => animation.finished))
 }

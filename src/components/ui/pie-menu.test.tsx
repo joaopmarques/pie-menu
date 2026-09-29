@@ -2,10 +2,17 @@ import { useState } from "react"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { PieMenu, PieMenuContent, PieMenuItem, PieMenuTrigger } from "./pie-menu"
+import {
+  PieMenu,
+  PieMenuContent,
+  PieMenuItem,
+  PieMenuTrigger,
+} from "./pie-menu"
 
 // Four items, clockwise from the top: up, right, down, left.
-function renderMenu(options: { openOn?: "press" | "contextmenu"; disabledRight?: boolean } = {}) {
+function renderMenu(
+  options: { openOn?: "press" | "contextmenu"; disabledRight?: boolean } = {}
+) {
   const onSelect = vi.fn()
   const onOpenChange = vi.fn()
   render(
@@ -22,13 +29,30 @@ function renderMenu(options: { openOn?: "press" | "contextmenu"; disabledRight?:
           </PieMenuItem>
         ))}
       </PieMenuContent>
-    </PieMenu>,
+    </PieMenu>
   )
-  return { onSelect, onOpenChange, trigger: screen.getByRole("button", { name: "Actions" }) }
+  return {
+    onSelect,
+    onOpenChange,
+    trigger: screen.getByRole("button", { name: "Actions" }),
+  }
 }
 
-const pointer = (type: string, x: number, y: number, init: PointerEventInit = {}) =>
-  new PointerEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: 1, pointerType: "mouse", ...init })
+const pointer = (
+  type: string,
+  x: number,
+  y: number,
+  init: PointerEventInit = {}
+) =>
+  new PointerEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+    pointerId: 1,
+    pointerType: "mouse",
+    ...init,
+  })
 
 describe("PieMenu", () => {
   it("wires the trigger to the menu with ARIA", async () => {
@@ -53,7 +77,9 @@ describe("PieMenu", () => {
     trigger.focus()
     await user.keyboard("{Enter}")
     expect(screen.getByRole("menuitem", { name: "Up" })).toHaveFocus()
-    expect(screen.getByRole("menuitem", { name: "Up" })).toHaveAttribute("data-highlighted")
+    expect(screen.getByRole("menuitem", { name: "Up" })).toHaveAttribute(
+      "data-highlighted"
+    )
   })
 
   it("picks items by direction with the arrow keys", async () => {
@@ -80,7 +106,10 @@ describe("PieMenu", () => {
     expect(screen.getByRole("menuitem", { name: "Down" })).toHaveFocus()
     await user.keyboard("{Shift>}{Tab}{/Shift}")
     expect(screen.getByRole("menuitem", { name: "Up" })).toHaveFocus()
-    expect(screen.getByRole("menuitem", { name: "Right" })).toHaveAttribute("aria-disabled", "true")
+    expect(screen.getByRole("menuitem", { name: "Right" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
   })
 
   it("jumps to an item with typeahead", async () => {
@@ -100,7 +129,9 @@ describe("PieMenu", () => {
     await user.keyboard("{ArrowDown}{Enter}")
 
     expect(onSelect).toHaveBeenCalledWith("Down")
-    await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument()
+    )
     expect(trigger).toHaveFocus()
   })
 
@@ -113,7 +144,9 @@ describe("PieMenu", () => {
 
     expect(onSelect).not.toHaveBeenCalled()
     expect(onOpenChange).toHaveBeenLastCalledWith(false)
-    await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument()
+    )
     expect(trigger).toHaveFocus()
   })
 
@@ -121,22 +154,47 @@ describe("PieMenu", () => {
     const user = userEvent.setup()
     const { trigger } = renderMenu({ openOn: "contextmenu" })
     trigger.focus()
+    await user.keyboard("{Shift>}{F10}{/Shift}")
+    expect(screen.getByRole("menu")).toBeInTheDocument()
+  })
 
+  it("opens a context-menu trigger with Enter, but not from a child input", async () => {
+    const user = userEvent.setup()
+    render(
+      <PieMenu>
+        <PieMenuTrigger asChild openOn="contextmenu">
+          <div role="button" tabIndex={0} aria-label="Canvas">
+            <input aria-label="Name" />
+          </div>
+        </PieMenuTrigger>
+        <PieMenuContent>
+          <PieMenuItem>Copy</PieMenuItem>
+        </PieMenuContent>
+      </PieMenu>
+    )
+
+    screen.getByRole("textbox", { name: "Name" }).focus()
     await user.keyboard("{Enter}")
     expect(screen.queryByRole("menu")).not.toBeInTheDocument()
 
-    await user.keyboard("{Shift>}{F10}{/Shift}")
+    screen.getByRole("button", { name: "Canvas" }).focus()
+    await user.keyboard("{Enter}")
     expect(screen.getByRole("menu")).toBeInTheDocument()
   })
 
   it("selects by direction on press, drag, and release", () => {
     const { trigger, onSelect } = renderMenu()
 
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
     expect(screen.getByRole("menu")).toBeInTheDocument()
 
     act(() => void window.dispatchEvent(pointer("pointermove", 260, 205)))
-    expect(screen.getByRole("menuitem", { name: "Right" })).toHaveAttribute("data-highlighted")
+    expect(screen.getByRole("menuitem", { name: "Right" })).toHaveAttribute(
+      "data-highlighted"
+    )
 
     act(() => void window.dispatchEvent(pointer("pointerup", 260, 205)))
     expect(onSelect).toHaveBeenCalledWith("Right")
@@ -144,14 +202,20 @@ describe("PieMenu", () => {
 
   it("selects on a fast flick with no move events", () => {
     const { trigger, onSelect } = renderMenu()
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
     act(() => void window.dispatchEvent(pointer("pointerup", 200, 120)))
     expect(onSelect).toHaveBeenCalledWith("Up")
   })
 
   it("highlights nothing when it opens from a pointer, even with an item under the pointer", () => {
     const { trigger } = renderMenu()
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
 
     // On open, the items start stacked at the center, so the release can land on one of them.
     const stacked = screen.getByRole("menuitem", { name: "Left" })
@@ -169,7 +233,10 @@ describe("PieMenu", () => {
 
   it("cancels when the drag returns to the center", () => {
     const { trigger, onSelect, onOpenChange } = renderMenu()
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
     act(() => void window.dispatchEvent(pointer("pointermove", 260, 200)))
     act(() => void window.dispatchEvent(pointer("pointerup", 202, 201)))
     expect(onSelect).not.toHaveBeenCalled()
@@ -178,7 +245,10 @@ describe("PieMenu", () => {
 
   it("stays open after a click in the center, then selects on the next click", () => {
     const { trigger, onSelect } = renderMenu()
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
     act(() => void window.dispatchEvent(pointer("pointerup", 201, 200)))
     expect(screen.getByRole("menu")).toBeInTheDocument()
 
@@ -189,9 +259,14 @@ describe("PieMenu", () => {
 
   it("does not select a disabled wedge", () => {
     const { trigger, onSelect } = renderMenu({ disabledRight: true })
-    act(() => void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 })))
+    act(
+      () =>
+        void fireEvent(trigger, pointer("pointerdown", 200, 200, { button: 0 }))
+    )
     act(() => void window.dispatchEvent(pointer("pointermove", 300, 200)))
-    expect(screen.getByRole("menuitem", { name: "Right" })).not.toHaveAttribute("data-highlighted")
+    expect(screen.getByRole("menuitem", { name: "Right" })).not.toHaveAttribute(
+      "data-highlighted"
+    )
     act(() => void window.dispatchEvent(pointer("pointerup", 300, 200)))
     expect(onSelect).not.toHaveBeenCalled()
   })
@@ -209,7 +284,7 @@ describe("PieMenu", () => {
             </PieMenuItem>
           ))}
         </PieMenuContent>
-      </PieMenu>,
+      </PieMenu>
     )
     screen.getByRole("button").focus()
     await user.keyboard("{Enter}")
@@ -242,17 +317,23 @@ describe("PieMenu", () => {
 
     // "New" goes between "Second" and "Last", and the ring re-flows to four slots.
     const items = screen.getAllByRole("menuitem")
-    expect(items.map((item) => item.textContent)).toEqual(["First", "Second", "New", "Last"])
-    expect(items.map((item) => item.style.getPropertyValue("--pie-item-angle"))).toEqual([
-      "0deg",
-      "90deg",
-      "180deg",
-      "270deg",
+    expect(items.map((item) => item.textContent)).toEqual([
+      "First",
+      "Second",
+      "New",
+      "Last",
     ])
+    expect(
+      items.map((item) => item.style.getPropertyValue("--pie-item-angle"))
+    ).toEqual(["0deg", "90deg", "180deg", "270deg"])
     expect(screen.getByRole("menuitem", { name: "Second" })).toHaveFocus()
 
     // The new item starts in the enter start state, then leaves it.
-    await waitFor(() => expect(screen.getByRole("menuitem", { name: "New" })).not.toHaveAttribute("data-starting-style"))
+    await waitFor(() =>
+      expect(screen.getByRole("menuitem", { name: "New" })).not.toHaveAttribute(
+        "data-starting-style"
+      )
+    )
 
     await user.keyboard("{Tab}")
     expect(screen.getByRole("menuitem", { name: "New" })).toHaveFocus()
@@ -264,9 +345,11 @@ describe("PieMenu", () => {
       <PieMenu>
         <PieMenuTrigger>Actions</PieMenuTrigger>
         <PieMenuContent>
-          <PieMenuItem onSelect={(event) => event.preventDefault()}>Stay</PieMenuItem>
+          <PieMenuItem onSelect={(event) => event.preventDefault()}>
+            Stay
+          </PieMenuItem>
         </PieMenuContent>
-      </PieMenu>,
+      </PieMenu>
     )
     screen.getByRole("button").focus()
     await user.keyboard("{Enter}")

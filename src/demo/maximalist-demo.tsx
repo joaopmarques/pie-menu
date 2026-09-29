@@ -28,7 +28,13 @@ const EGG_LABELS = new Set<string>(EGG_PAIR)
 const EGG_SWITCHES = 3
 const SURPRISE_MS = 900
 // The soft hyphen lets the long word break inside the round sticker.
-const SECRET: Snack = { emoji: "💊", label: "Antidepressant", display: "Anti\u00ADdepressant", color: "#ff4fd8", secret: true }
+const SECRET: Snack = {
+  emoji: "💊",
+  label: "Antidepressant",
+  display: "Anti\u00ADdepressant",
+  color: "#ff4fd8",
+  secret: true,
+}
 const SECRET_MESSAGE = "The world needs more joy. Keep being awesome! ❤️"
 
 /**
@@ -40,7 +46,10 @@ export function MaximalistDemo() {
   const [unlocked, setUnlocked] = useState(false)
   const [announcement, setAnnouncement] = useState("")
   const [surprise, setSurprise] = useState(false)
-  const trail = useRef<{ last: string | null; switches: number }>({ last: null, switches: 0 })
+  const trail = useRef<{ last: string | null; switches: number }>({
+    last: null,
+    switches: 0,
+  })
 
   const snacks = useMemo(() => {
     if (!unlocked) return SNACKS
@@ -56,19 +65,24 @@ export function MaximalistDemo() {
     if (unlocked) return
     const { last, switches } = trail.current
     if (label === last) return
-    const isSwitch = EGG_LABELS.has(label) && last !== null && EGG_LABELS.has(last)
+    const isSwitch =
+      EGG_LABELS.has(label) && last !== null && EGG_LABELS.has(last)
     trail.current = { last: label, switches: isSwitch ? switches + 1 : 0 }
     if (trail.current.switches < EGG_SWITCHES) return
     setUnlocked(true)
     setSurprise(true)
     window.setTimeout(() => setSurprise(false), SURPRISE_MS)
-    setAnnouncement(`A secret item appeared between ${EGG_PAIR[0]} and ${EGG_PAIR[1]}.`)
+    setAnnouncement(
+      `A secret item appeared between ${EGG_PAIR[0]} and ${EGG_PAIR[1]}.`
+    )
   }
 
   const choose = (snack: Snack) =>
     setOrder((current) => ({
       key: (current?.key ?? 0) + 1,
-      text: snack.secret ? SECRET_MESSAGE : `Order up: ${snack.emoji} ${snack.label}!`,
+      text: snack.secret
+        ? SECRET_MESSAGE
+        : `Order up: ${snack.emoji} ${snack.label}!`,
     }))
 
   return (
@@ -84,7 +98,10 @@ export function MaximalistDemo() {
           deadZone={56}
           aria-label="Snack menu"
         >
-          <Pie.Center className="maxi-disc" style={{ "--maxi-disc": disc } as CSSProperties} />
+          <Pie.Center
+            className="maxi-disc"
+            style={{ "--maxi-disc": disc } as CSSProperties}
+          />
           <Pie.Indicator className="maxi-wedge">
             <svg viewBox="-100 -100 200 200">
               <path d={wedge} />
@@ -107,7 +124,9 @@ export function MaximalistDemo() {
               <span className="maxi-item__emoji" aria-hidden>
                 {snack.emoji}
               </span>
-              <span className="maxi-item__label">{snack.display ?? snack.label}</span>
+              <span className="maxi-item__label">
+                {snack.display ?? snack.label}
+              </span>
             </Pie.Item>
           ))}
         </Pie.Content>

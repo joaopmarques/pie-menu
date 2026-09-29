@@ -9,5 +9,5 @@ import { OgCard } from "./og-card"
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <OgCard />
-  </StrictMode>,
+  </StrictMode>
 )

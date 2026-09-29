@@ -20,7 +20,10 @@ const HIGHLIGHT_ANGLE = 60
 
 const browser = await chromium.launch()
 try {
-  const page = await browser.newPage({ viewport: CARD, deviceScaleFactor: SCALE })
+  const page = await browser.newPage({
+    viewport: CARD,
+    deviceScaleFactor: SCALE,
+  })
   await page.goto(url, { waitUntil: "networkidle" })
   await page.waitForSelector('[data-slot="pie-menu-item"]')
   await page.evaluate(() => document.fonts.ready)
@@ -32,7 +35,10 @@ try {
     return { x: rect.left, y: rect.top }
   })
   const radians = (HIGHLIGHT_ANGLE * Math.PI) / 180
-  const target = { x: center.x + Math.sin(radians) * 90, y: center.y - Math.cos(radians) * 90 }
+  const target = {
+    x: center.x + Math.sin(radians) * 90,
+    y: center.y - Math.cos(radians) * 90,
+  }
   await page.mouse.move(center.x, center.y)
   await page.mouse.move(target.x, target.y, { steps: 8 })
   // Wait for the highlight, the arc, and the head turn to settle.
@@ -42,13 +48,23 @@ try {
   const raw = path.join(scratch, "raw.png")
   await page.screenshot({ path: raw })
   execFileSync(ffmpeg, [
-    "-y", "-loglevel", "error", "-i", raw,
-    "-vf", "scale=1200:630:flags=lanczos",
-    "-compression_level", "100", "-pred", "mixed",
+    "-y",
+    "-loglevel",
+    "error",
+    "-i",
+    raw,
+    "-vf",
+    "scale=1200:630:flags=lanczos",
+    "-compression_level",
+    "100",
+    "-pred",
+    "mixed",
     output,
   ])
   rmSync(scratch, { recursive: true, force: true })
-  console.log(`Wrote ${path.relative(root, output)} (${statSync(output).size} bytes)`)
+  console.log(
+    `Wrote ${path.relative(root, output)} (${statSync(output).size} bytes)`
+  )
 } finally {
   await browser.close()
 }

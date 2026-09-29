@@ -98,8 +98,14 @@ describe("menuExtents and clampCenter", () => {
 
   it("moves the center away from the viewport edges", () => {
     const viewport = { width: 1000, height: 800 }
-    expect(clampCenter({ x: 20, y: 400 }, extents, viewport, 8)).toEqual({ x: 188, y: 400 })
-    expect(clampCenter({ x: 500, y: 790 }, extents, viewport, 8)).toEqual({ x: 500, y: 672 })
+    expect(clampCenter({ x: 20, y: 400 }, extents, viewport, 8)).toEqual({
+      x: 188,
+      y: 400,
+    })
+    expect(clampCenter({ x: 500, y: 790 }, extents, viewport, 8)).toEqual({
+      x: 500,
+      y: 672,
+    })
   })
 
   it("shrinks a menu that is wider than the viewport", () => {

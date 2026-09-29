@@ -1,6 +1,12 @@
-import { useRef, useState, type PointerEvent as ReactPointerEvent, type Ref } from "react"
+import {
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type Ref,
+} from "react"
 import type { LucideIcon } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import {
   PieMenu,
   PieMenuCenter,
@@ -9,10 +15,9 @@ import {
   PieMenuItem,
   PieMenuTrigger,
 } from "@/components/ui/pie-menu"
-import { cn } from "@/lib/utils"
 
-import { ROOM_OBJECTS, SELF_ACTIONS, type RoomAction } from "./room-actions"
 import { CharacterAvatar, CharacterHead, PIP, ThoughtBubble } from "./character"
+import { ROOM_OBJECTS, SELF_ACTIONS, type RoomAction } from "./room-actions"
 
 const MAX_QUEUE = 5
 const LOOK_RANGE = 260
@@ -35,7 +40,10 @@ export function RoomDemo() {
       return
     }
     const id = nextId.current++
-    setQueue((current) => [...current, { id, label: action.label, icon: action.icon }])
+    setQueue((current) => [
+      ...current,
+      { id, label: action.label, icon: action.icon },
+    ])
     setAnnouncement(`Pip queued ${action.label} on ${target}.`)
   }
 
@@ -46,7 +54,8 @@ export function RoomDemo() {
     const rect = character.getBoundingClientRect()
     const dx = event.clientX - (rect.left + rect.width / 2)
     const dy = event.clientY - (rect.top + rect.height / 3)
-    const scale = Math.min(Math.hypot(dx, dy) / LOOK_RANGE, 1) / (Math.hypot(dx, dy) || 1)
+    const scale =
+      Math.min(Math.hypot(dx, dy) / LOOK_RANGE, 1) / (Math.hypot(dx, dy) || 1)
     character.style.setProperty("--pie-aim-x", String(dx * scale))
     character.style.setProperty("--pie-aim-y", String(dy * scale))
   }
@@ -65,7 +74,10 @@ export function RoomDemo() {
       >
         <Wallpaper />
 
-        <ActionQueue queue={queue} onDone={() => setQueue((current) => current.slice(1))} />
+        <ActionQueue
+          queue={queue}
+          onDone={() => setQueue((current) => current.slice(1))}
+        />
 
         {ROOM_OBJECTS.map((object) => (
           <PieMenu key={object.id}>
@@ -76,7 +88,10 @@ export function RoomDemo() {
             >
               <ObjectTile icon={object.icon} name={object.name} />
             </PieMenuTrigger>
-            <ActionPieContent actions={object.actions} onChoose={(action) => enqueue(action, object.name)} />
+            <ActionPieContent
+              actions={object.actions}
+              onChoose={(action) => enqueue(action, object.name)}
+            />
           </PieMenu>
         ))}
 
@@ -88,12 +103,15 @@ export function RoomDemo() {
           >
             <CharacterFigure ref={characterRef} />
           </PieMenuTrigger>
-          <ActionPieContent actions={SELF_ACTIONS} onChoose={(action) => enqueue(action, "Pip")} />
+          <ActionPieContent
+            actions={SELF_ACTIONS}
+            onChoose={(action) => enqueue(action, "Pip")}
+          />
         </PieMenu>
 
         <p className="absolute right-3 bottom-3 left-3 text-xs text-muted-foreground sm:right-auto">
-          Press an object, drag toward an action, and let go. Or click it and click again. Keyboard: Tab to an object,
-          then Enter.
+          Press an object, drag toward an action, and let go. Or click it and
+          click again. Keyboard: Tab to an object, then Enter.
         </p>
       </div>
 
@@ -104,7 +122,13 @@ export function RoomDemo() {
   )
 }
 
-function ActionPieContent({ actions, onChoose }: { actions: RoomAction[]; onChoose: (action: RoomAction) => void }) {
+function ActionPieContent({
+  actions,
+  onChoose,
+}: {
+  actions: RoomAction[]
+  onChoose: (action: RoomAction) => void
+}) {
   return (
     <PieMenuContent radius={124} deadZone={30}>
       <PieMenuIndicator className="size-32" />
@@ -112,7 +136,11 @@ function ActionPieContent({ actions, onChoose }: { actions: RoomAction[]; onChoo
         <CharacterAvatar look={PIP} />
       </PieMenuCenter>
       {actions.map((action) => (
-        <PieMenuItem key={action.label} disabled={action.disabled} onSelect={() => onChoose(action)}>
+        <PieMenuItem
+          key={action.label}
+          disabled={action.disabled}
+          onSelect={() => onChoose(action)}
+        >
           <action.icon />
           {action.label}
         </PieMenuItem>
@@ -128,7 +156,7 @@ function ObjectTile({ icon: Icon, name }: { icon: LucideIcon; name: string }) {
         className={cn(
           "grid size-14 place-items-center rounded-2xl border bg-card text-foreground shadow-md transition-[translate,box-shadow] duration-200 ease-out sm:size-16",
           "group-hover:-translate-y-1 group-hover:shadow-lg group-data-[state=open]:-translate-y-1 group-data-[state=open]:ring-2 group-data-[state=open]:ring-ring",
-          "group-focus-visible:ring-[3px] group-focus-visible:ring-ring/50 motion-reduce:transition-none",
+          "group-focus-visible:ring-[3px] group-focus-visible:ring-ring/50 motion-reduce:transition-none"
         )}
       >
         <Icon className="size-7 sm:size-8" strokeWidth={1.6} />
@@ -153,10 +181,32 @@ function CharacterFigure({ ref }: { ref: Ref<HTMLDivElement> }) {
         <rect x="32" y="40" width="9" height="20" rx="4" fill="#334155" />
         <ellipse cx="23" cy="61" rx="6" ry="3" fill="#1e293b" />
         <ellipse cx="37" cy="61" rx="6" ry="3" fill="#1e293b" />
-        <rect x="8" y="10" width="8" height="26" rx="4" fill={PIP.skin} transform="rotate(10 12 10)" />
-        <rect x="44" y="10" width="8" height="26" rx="4" fill={PIP.skin} transform="rotate(-10 48 10)" />
+        <rect
+          x="8"
+          y="10"
+          width="8"
+          height="26"
+          rx="4"
+          fill={PIP.skin}
+          transform="rotate(10 12 10)"
+        />
+        <rect
+          x="44"
+          y="10"
+          width="8"
+          height="26"
+          rx="4"
+          fill={PIP.skin}
+          transform="rotate(-10 48 10)"
+        />
         <rect x="14" y="4" width="32" height="40" rx="11" fill={PIP.shirt} />
-        <path d="M24 5 L30 13 L36 5" stroke="#fff" strokeOpacity="0.5" strokeWidth="2" fill="none" />
+        <path
+          d="M24 5 L30 13 L36 5"
+          stroke="#fff"
+          strokeOpacity="0.5"
+          strokeWidth="2"
+          fill="none"
+        />
       </svg>
       <span className="-mt-1 h-2 w-14 rounded-full bg-foreground/10 blur-[2px]" />
       <span className="mt-1 rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-medium text-muted-foreground backdrop-blur-sm">
@@ -166,7 +216,13 @@ function CharacterFigure({ ref }: { ref: Ref<HTMLDivElement> }) {
   )
 }
 
-function ActionQueue({ queue, onDone }: { queue: QueuedAction[]; onDone: () => void }) {
+function ActionQueue({
+  queue,
+  onDone,
+}: {
+  queue: QueuedAction[]
+  onDone: () => void
+}) {
   const current = queue[0]
   return (
     <div className="absolute top-3 left-3 z-10 space-y-1.5">
@@ -174,7 +230,13 @@ function ActionQueue({ queue, onDone }: { queue: QueuedAction[]; onDone: () => v
         {Array.from({ length: MAX_QUEUE }, (_, index) => {
           const item = queue[index]
           if (!item) {
-            return <li key={`empty-${index}`} aria-hidden className="size-10 rounded-xl border border-dashed bg-background/40" />
+            return (
+              <li
+                key={`empty-${index}`}
+                aria-hidden
+                className="size-10 rounded-xl border border-dashed bg-background/40"
+              />
+            )
           }
           return (
             <li
@@ -186,7 +248,10 @@ function ActionQueue({ queue, onDone }: { queue: QueuedAction[]; onDone: () => v
               <span className="sr-only">{item.label}</span>
               {index === 0 && (
                 <span className="absolute inset-x-1.5 bottom-1 h-1 overflow-hidden rounded-full bg-muted">
-                  <span className="queue-progress block h-full rounded-full bg-green-500" onAnimationEnd={onDone} />
+                  <span
+                    className="queue-progress block h-full rounded-full bg-green-500"
+                    onAnimationEnd={onDone}
+                  />
                 </span>
               )}
             </li>
@@ -196,7 +261,8 @@ function ActionQueue({ queue, onDone }: { queue: QueuedAction[]; onDone: () => v
       <p className="text-xs font-medium text-muted-foreground">
         {current ? (
           <>
-            Pip is doing: <span className="text-foreground">{current.label}</span>
+            Pip is doing:{" "}
+            <span className="text-foreground">{current.label}</span>
           </>
         ) : (
           "Pip is idle."

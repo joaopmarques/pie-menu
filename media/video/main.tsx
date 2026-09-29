@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react"
+import {
+  Check,
+  ClipboardPaste,
+  Copy,
+  CopyPlus,
+  Scissors,
+  Share2,
+  Trash2,
+} from "lucide-react"
 import { createRoot } from "react-dom/client"
-import { Check, ClipboardPaste, Copy, CopyPlus, Scissors, Share2, Trash2 } from "lucide-react"
 
 import {
   PieMenu,
@@ -9,6 +17,7 @@ import {
   PieMenuItem,
   PieMenuTrigger,
 } from "@/components/ui/pie-menu"
+
 import "@/index.css"
 import "./video.css"
 
@@ -29,7 +38,10 @@ function Cursor() {
 
   useEffect(() => {
     const move = (event: PointerEvent) => {
-      ref.current?.style.setProperty("translate", `${event.clientX}px ${event.clientY}px`)
+      ref.current?.style.setProperty(
+        "translate",
+        `${event.clientX}px ${event.clientY}px`
+      )
     }
     const onDown = (event: PointerEvent) => {
       move(event)
@@ -52,7 +64,12 @@ function Cursor() {
   }, [])
 
   return (
-    <div ref={ref} className="video-cursor" style={{ translate: "-100px -100px" }} aria-hidden>
+    <div
+      ref={ref}
+      className="video-cursor"
+      style={{ translate: "-100px -100px" }}
+      aria-hidden
+    >
       {press > 0 && <span key={press} className="video-press-ring" />}
       <svg
         className="video-cursor-arrow"
@@ -89,7 +106,8 @@ function Toast({ text, onDone }: { text: string; onDone: () => void }) {
 
 function Recording() {
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null)
-  const show = (text: string) => setToast((current) => ({ id: (current?.id ?? 0) + 1, text }))
+  const show = (text: string) =>
+    setToast((current) => ({ id: (current?.id ?? 0) + 1, text }))
 
   return (
     <>
@@ -111,7 +129,9 @@ function Recording() {
           </PieMenuItem>
         </PieMenuContent>
       </PieMenu>
-      {toast && <Toast key={toast.id} text={toast.text} onDone={() => setToast(null)} />}
+      {toast && (
+        <Toast key={toast.id} text={toast.text} onDone={() => setToast(null)} />
+      )}
       <Cursor />
     </>
   )

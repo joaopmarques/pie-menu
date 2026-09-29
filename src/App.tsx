@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { Heart } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/sonner"
 import { AgentSetupButton } from "@/demo/agent-setup"
 import { ContextMenuDemo, ReactionDemo } from "@/demo/basic-demos"
@@ -11,10 +12,12 @@ import { MaximalistDemo } from "@/demo/maximalist-demo"
 import { RoomDemo } from "@/demo/room-demo"
 import { ThemeToggle } from "@/demo/theme-toggle"
 import { VideoDemo } from "@/demo/video-demo"
-import { cn } from "@/lib/utils"
 
 const KEYS: Array<[string, string]> = [
-  ["Enter / Space", "Open from a press trigger. Select the highlighted item."],
+  [
+    "Enter / Space",
+    "Open from a focused trigger. Select the highlighted item.",
+  ],
   ["Shift+F10 / Menu key", "Open from any trigger."],
   ["Arrow keys", "Pick by direction. Hold two arrows for a diagonal."],
   ["Tab / Shift+Tab", "Walk around the ring."],
@@ -41,19 +44,27 @@ export function App() {
       </a>
       <Toaster />
 
-      <main id="main" className="mx-auto max-w-5xl space-y-20 px-4 py-12 sm:px-6 sm:py-16">
+      <main
+        id="main"
+        className="mx-auto max-w-5xl space-y-20 px-4 py-12 sm:px-6 sm:py-16"
+      >
         <header className="space-y-6">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-medium text-muted-foreground">shadcn/ui registry component</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              shadcn/ui registry component
+            </p>
             <div className="flex items-center gap-2">
               <GitHubLink />
               <ThemeToggle />
             </div>
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Pie Menu</h1>
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            Pie Menu
+          </h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
-            A radial menu for React, in the tradition of Don Hopkins&apos; pie menus. Every item is one short flick
-            away. Press, drag toward an option, and let go. After a while, you do not need to look.
+            A radial menu for React, in the tradition of Don Hopkins&apos; pie
+            menus. Every item is one short flick away. Press, drag toward an
+            option, and let go. After a while, you do not need to look.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <AgentSetupButton className="sm:self-stretch" />
@@ -88,12 +99,22 @@ export function App() {
           <RoomDemo />
         </Section>
 
-        <Section id="examples" title="More examples" description="The same component with different settings and styles.">
+        <Section
+          id="examples"
+          title="More examples"
+          description="The same component with different settings and styles."
+        >
           <div className="grid gap-10 md:grid-cols-2">
-            <SubSection title="Context menu" description='openOn="contextmenu". It works with right click, long press, and Shift+F10.'>
+            <SubSection
+              title="Context menu"
+              description='openOn="contextmenu". It works with right click, long press, and Shift+F10.'
+            >
               <ContextMenuDemo />
             </SubSection>
-            <SubSection title="Icon only" description='openOn="press", a small radius, and an aria-label on each item.'>
+            <SubSection
+              title="Icon only"
+              description='openOn="press", a small radius, and an aria-label on each item.'
+            >
               <ReactionDemo />
             </SubSection>
             <SubSection
@@ -106,16 +127,25 @@ export function App() {
           </div>
         </Section>
 
-        <Section id="keyboard" title="Keyboard" description="The menu uses the ARIA menu pattern, with a few extras for the ring.">
+        <Section
+          id="keyboard"
+          title="Keyboard"
+          description="The menu uses the ARIA menu pattern, with a few extras for the ring."
+        >
           <div className="overflow-hidden rounded-xl border">
             <table className="w-full text-sm">
               <tbody>
                 {KEYS.map(([key, action]) => (
                   <tr key={key} className="border-b last:border-0">
-                    <th scope="row" className="w-48 bg-muted/40 px-4 py-2.5 text-left font-medium whitespace-nowrap">
+                    <th
+                      scope="row"
+                      className="w-48 bg-muted/40 px-4 py-2.5 text-left font-medium whitespace-nowrap"
+                    >
                       {key}
                     </th>
-                    <td className="px-4 py-2.5 text-muted-foreground">{action}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">
+                      {action}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -134,8 +164,9 @@ export function App() {
         <footer className="flex flex-col gap-6 border-t pt-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
             <p>
-              Based on the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986),
-              and the marking menus of Gordon Kurtenbach and Bill Buxton.
+              Based on the pie menus of Don Hopkins, Jack Callahan, and Mark
+              Weiser (University of Maryland, 1986), and the marking menus of
+              Gordon Kurtenbach and Bill Buxton.
             </p>
             <p>
               Made with{" "}
@@ -162,11 +193,28 @@ export function App() {
   )
 }
 
-function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) {
+function Section({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string
+  title: string
+  description: string
+  children: ReactNode
+}) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-8 space-y-6">
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className="scroll-mt-8 space-y-6"
+    >
       <div className="space-y-1">
-        <h2 id={`${id}-title`} className="text-2xl font-semibold tracking-tight">
+        <h2
+          id={`${id}-title`}
+          className="text-2xl font-semibold tracking-tight"
+        >
           {title}
         </h2>
         <p className="text-muted-foreground">{description}</p>

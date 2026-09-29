@@ -15,7 +15,7 @@ Pie Menu is a radial menu component for React. It ships as a shadcn/ui registry 
 
 - React 19. The code uses `ref` as a prop, `use()`, and `<Context value>`. Do not add `forwardRef` or `.Provider`.
 - Tailwind CSS v4. The styled layer uses v4 variants such as `data-highlighted:`, `not-data-selected:`, and `group-data-[...]/pie-menu:`.
-- TypeScript 7, Vite 8, Vitest 5, pnpm.
+- TypeScript 6.0, Vite 8, Vitest 5, ESLint 9, Prettier 3, and pnpm. Stay on TypeScript 6.0 or lower: `typescript-eslint` does not support TypeScript 7 yet. Stay on ESLint 9: the React and jsx-a11y plugins do not support ESLint 10 yet.
 - The only runtime dependency of the component is `radix-ui`, for `Slot`. Keep it that way.
 
 ## Commands
@@ -23,14 +23,17 @@ Pie Menu is a radial menu component for React. It ships as a shadcn/ui registry 
 | Command | Action |
 | --- | --- |
 | `pnpm dev` | Start the landing page on http://localhost:5173. |
-| `pnpm test` | Run the unit and interaction tests (30 tests). |
+| `pnpm test` | Run the unit and interaction tests (31 tests). |
+| `pnpm lint` | Run ESLint. `pnpm lint:fix` fixes what it can. |
+| `pnpm format:write` | Format with Prettier. `pnpm format:check` only checks. |
+| `pnpm check` | Run lint, the type check, the format check, and the tests, in that order. |
 | `pnpm typecheck` | Type-check `src`. |
 | `pnpm build` | Type-check and build the site into `dist`. |
 | `pnpm registry:build` | Write the registry files to `public/r`. |
 | `pnpm media:og` | Render `public/og.png`. The dev server must run first. |
 | `pnpm media:video` | Record the demo videos into `public/media`. The dev server must run first. |
 
-Before you finish any change, run `pnpm typecheck`, `pnpm test`, and `pnpm build`. The build writes `tsconfig.tsbuildinfo`. It is in `.gitignore`.
+Before you finish any change, run `pnpm check` and `pnpm build`. Run `pnpm format:write` first if the format check fails. The build writes `tsconfig.tsbuildinfo`. It is in `.gitignore`.
 
 ## File map
 
@@ -87,6 +90,7 @@ Before you finish any change, run `pnpm typecheck`, `pnpm test`, and `pnpm build
 
 - Arrow keys pick by direction. Two held arrows give a diagonal.
 - Tab and Shift+Tab walk the ring. Home and End pick the first and last items. Letters run a typeahead.
+- Enter and Space open a `press` trigger. They also open a `contextmenu` trigger, but only when the trigger itself has focus, so keys typed in a child input are left alone. The ContextMenu key and Shift+F10 open both kinds.
 - Enter and Space select. The code ignores `event.repeat`, so a held key from the trigger does not select at once.
 - Escape closes. `onEscapeKeyDown` can call `preventDefault()` to keep the menu open.
 
@@ -115,6 +119,19 @@ Before you finish any change, run `pnpm typecheck`, `pnpm test`, and `pnpm build
 - The content measures the items and the first `[data-pie-menu-center]` before paint.
 - If the menu is bigger than the viewport, it scales down, to 50% at the most. Then it moves away from the edges by `collisionPadding`.
 - The viewport size falls back to `innerWidth` and `innerHeight` when `clientWidth` is 0, as in jsdom.
+
+## Lint and format
+
+The setup follows shadcn/ui, so pull requests to shadcn projects need no reformatting.
+
+- `eslint.config.js` has the rules of the shadcn/ui app (`apps/v4/eslint.config.mjs`): the React, React Hooks, and jsx-a11y rules that the Next.js preset bundles, plus `typescript-eslint`. It uses the same overrides, including inline type imports. It uses the full jsx-a11y recommended set, because accessibility is a hard requirement.
+- `prettier.config.mjs` has the shadcn/ui options: no semicolons, double quotes, a print width of 80, `es5` trailing commas, sorted imports, and sorted Tailwind classes (`cn` and `cva` too).
+- React Hooks v7 has the React Compiler rules. They caught real issues, so keep them on. The patterns that pass:
+  - Do not read or write `ref.current` during render. Sync refs in a layout effect.
+  - Compose refs with `useComposedRefs(a, b)`, not with a `composeRefs` call in render.
+  - Write event handlers inline in JSX. Call the user handler first with `callHandler(handler, event)`, which returns true when the user prevented the default.
+  - Do not call `setState` directly in an effect. For state that follows a prop, adjust it during render with a "previous value" state (see `use-presence.ts` and `Indicator`).
+- Do not add `eslint-disable` comments to make an error go away. Fix the cause. If a rule is wrong for this project, turn it off in `eslint.config.js` with a comment that says why.
 
 ## Keep the docs in sync (required)
 

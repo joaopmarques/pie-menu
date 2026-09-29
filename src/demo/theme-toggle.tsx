@@ -20,7 +20,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={cn(
         "inline-flex h-9 items-center gap-2 rounded-full border bg-background px-3.5 text-sm font-medium outline-none",
         "hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        className,
+        className
       )}
     >
       <Icon className="size-4" aria-hidden />

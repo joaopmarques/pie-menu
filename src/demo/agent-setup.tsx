@@ -15,7 +15,7 @@ Pie Menu is a radial menu for React, shipped as a shadcn/ui registry item. Docs:
 3. Read the docs above before you write code. Use only the parts and props that they list.
 4. Find one place in the app where a pie menu helps, such as a context menu or a group of related actions. If no place is clear, ask me.
 5. Add a menu there with PieMenu, PieMenuTrigger, PieMenuContent, PieMenuItem, and PieMenuIndicator. Use the icons and actions that the app already has.
-6. Keep it accessible. Give icon-only items an aria-label and a textValue. If the trigger is not a button, give it tabIndex={0}.
+6. Keep it accessible. Give icon-only items an aria-label and a textValue. If the trigger is not a button, give it role="button" and tabIndex={0}.
 7. Run the type check, the linter, and the tests. Fix any errors.
 8. Tell me which files you added or changed, and how to try the menu.`
 
@@ -23,7 +23,8 @@ export function AgentSetupButton({ className }: { className?: string }) {
   const copy = async () => {
     if (!(await copyText(AGENT_SETUP_PROMPT))) {
       toast.error("Could not copy the prompt", {
-        description: "The browser blocked the clipboard. Try again, or allow clipboard access for this site.",
+        description:
+          "The browser blocked the clipboard. Try again, or allow clipboard access for this site.",
       })
       return
     }
@@ -41,7 +42,7 @@ export function AgentSetupButton({ className }: { className?: string }) {
         // emerald-400 is light, so the text is emerald-950 (7.8:1). White text would be 1.9:1.
         "bg-emerald-400 text-emerald-950 shadow-xs hover:bg-emerald-300 active:bg-emerald-500",
         "focus-visible:ring-[3px] focus-visible:ring-emerald-400/50",
-        className,
+        className
       )}
     >
       <Bot className="size-4" aria-hidden />

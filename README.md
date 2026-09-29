@@ -94,8 +94,8 @@ A `button` by default. Use `asChild` to render your own element.
 
 | Prop | Type | Default | Notes |
 | --- | --- | --- | --- |
-| `openOn` | `"press" \| "contextmenu"` | `"press"` | `press`: primary press, Enter, or Space. `contextmenu`: right click or a long press on touch. |
-| `asChild` | `boolean` | `false` | With a non-button child in `contextmenu` mode, add `tabIndex={0}` so keyboard users can reach it. |
+| `openOn` | `"press" \| "contextmenu"` | `"press"` | `press`: primary press, Enter, or Space. `contextmenu`: right click, a long press on touch, or Enter and Space when the trigger itself has focus. |
+| `asChild` | `boolean` | `false` | With a non-button child, add `role="button"` and `tabIndex={0}`, so keyboard and screen reader users can reach it. |
 | `disabled` | `boolean` | | |
 
 In both modes, the ContextMenu key and Shift+F10 open the menu.
@@ -165,7 +165,7 @@ Returns `{ x, y, angle, distance }` for the live aim, inside `PieMenuContent`. T
 | Press, drag out, drag back to the center, release | Cancels. |
 | Click in place | Keeps the menu open. The next click selects, or cancels in the center. |
 | Open with a pointer | Nothing is highlighted until the pointer leaves the center. A keyboard open highlights the first item. |
-| Enter or Space on a press trigger | Opens the menu and focuses the first item. |
+| Enter or Space on a trigger | Opens the menu and focuses the first item. On a `contextmenu` trigger, only when the trigger itself has focus. |
 | Arrow keys | Pick by direction. Hold two arrows for a diagonal. |
 | Tab, Shift+Tab | Walk around the ring. |
 | Home, End | First or last item. |

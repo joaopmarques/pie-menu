@@ -49,9 +49,12 @@ function apply() {
 export function setTheme(theme: Theme) {
   stored = theme === systemTheme() ? null : theme
   writeStored(stored)
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
   // A cross-fade between themes, where the browser supports it.
-  if (!reduceMotion && document.startViewTransition) document.startViewTransition(apply)
+  if (!reduceMotion && document.startViewTransition)
+    document.startViewTransition(apply)
   else apply()
 }
 

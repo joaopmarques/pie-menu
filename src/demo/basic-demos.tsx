@@ -1,5 +1,13 @@
 import { useState } from "react"
-import { ClipboardPaste, Copy, CopyPlus, Scissors, Share2, SmilePlus, Trash2 } from "lucide-react"
+import {
+  ClipboardPaste,
+  Copy,
+  CopyPlus,
+  Scissors,
+  Share2,
+  SmilePlus,
+  Trash2,
+} from "lucide-react"
 
 import {
   PieMenu,
@@ -34,9 +42,10 @@ export function ContextMenuDemo() {
         <PieMenuTrigger
           asChild
           openOn="contextmenu"
-          aria-label="Canvas. Open the context menu with right click, long press, or Shift+F10."
+          aria-label="Canvas. Open the context menu with Enter, right click, long press, or Shift+F10."
         >
           <div
+            role="button"
             tabIndex={0}
             className="grid h-56 place-items-center rounded-xl border border-dashed bg-muted/30 text-sm text-muted-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[state=open]:border-ring"
           >
@@ -58,7 +67,8 @@ export function ContextMenuDemo() {
         </PieMenuContent>
       </PieMenu>
       <p className="text-sm text-muted-foreground" aria-live="polite">
-        Last action: <span className="font-medium text-foreground">{last ?? "none"}</span>
+        Last action:{" "}
+        <span className="font-medium text-foreground">{last ?? "none"}</span>
       </p>
     </div>
   )

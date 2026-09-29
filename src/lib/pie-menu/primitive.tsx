@@ -15,14 +15,22 @@ import {
   type ReactNode,
   type RefObject,
 } from "react"
-import { createPortal } from "react-dom"
 import { Slot } from "radix-ui"
+import { createPortal } from "react-dom"
 
-import { aimFromVector, aimStyle, createAimStore, IDLE_AIM, useAimStore, type AimStore } from "./aim"
+import {
+  aimFromVector,
+  aimStyle,
+  createAimStore,
+  IDLE_AIM,
+  useAimStore,
+  type AimStore,
+} from "./aim"
 import {
   clampCenter,
   degToRad,
   fitScale,
+  itemTranslate,
   layoutItems,
   menuExtents,
   nearestIndex,
@@ -32,11 +40,16 @@ import {
   stepIndex,
   vectorAngle,
   wedgeIndex,
-  itemTranslate,
   type ItemLayout,
   type Point,
 } from "./geometry"
-import { composeHandlers, composeRefs, useControllableState, useLatest } from "./hooks"
+import {
+  callHandler,
+  composeHandlers,
+  useComposedRefs,
+  useControllableState,
+  useLatest,
+} from "./hooks"
 import { usePresence, type PresenceStatus } from "./use-presence"
 
 export type { Aim } from "./aim"
@@ -88,13 +101,24 @@ export interface PieMenuProps {
   children?: ReactNode
 }
 
-export function Root({ open: openProp, defaultOpen = false, onOpenChange, children }: PieMenuProps) {
-  const [open, setOpen] = useControllableState({ value: openProp, defaultValue: defaultOpen, onChange: onOpenChange })
+export function Root({
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
+  children,
+}: PieMenuProps) {
+  const [open, setOpen] = useControllableState({
+    value: openProp,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  })
   const [request, setRequest] = useState<OpenRequest | null>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
   // Mirrors `open` without waiting for a render, so two events in one frame cannot open twice.
   const openRef = useRef(open)
-  openRef.current = open
+  useLayoutEffect(() => {
+    openRef.current = open
+  }, [open])
   const keyRef = useRef(0)
   const triggerId = useId()
   const contentId = useId()
@@ -106,7 +130,7 @@ export function Root({ open: openProp, defaultOpen = false, onOpenChange, childr
       setRequest({ ...next, key: keyRef.current })
       setOpen(true)
     },
-    [setOpen],
+    [setOpen]
   )
 
   const close = useCallback(() => {
@@ -115,8 +139,17 @@ export function Root({ open: openProp, defaultOpen = false, onOpenChange, childr
   }, [setOpen])
 
   const value = useMemo<RootContextValue>(
-    () => ({ open, request, openAt, close, isOpen: () => openRef.current, triggerRef, triggerId, contentId }),
-    [open, request, openAt, close, triggerId, contentId],
+    () => ({
+      open,
+      request,
+      openAt,
+      close,
+      isOpen: () => openRef.current,
+      triggerRef,
+      triggerId,
+      contentId,
+    }),
+    [open, request, openAt, close, triggerId, contentId]
   )
 
   return <RootContext value={value}>{children}</RootContext>
@@ -131,7 +164,8 @@ export interface PieMenuTriggerProps extends ComponentProps<"button"> {
   /**
    * - `press`: primary press opens the menu at the pointer. Drag and release to select.
    *   Enter and Space open it from the keyboard.
-   * - `contextmenu`: right click or long press opens the menu.
+   * - `contextmenu`: right click or long press opens the menu. Enter and Space open it
+   *   when the trigger itself has focus, so keys typed in a child input are left alone.
    *
    * In both modes, the ContextMenu key and Shift+F10 open the menu from the keyboard.
    */
@@ -152,7 +186,12 @@ export function Trigger({
   ...props
 }: PieMenuTriggerProps) {
   const context = useRootContext("PieMenuTrigger")
-  const longPress = useRef<{ timer: number; pointerId: number; x: number; y: number } | null>(null)
+  const longPress = useRef<{
+    timer: number
+    pointerId: number
+    x: number
+    y: number
+  } | null>(null)
 
   const cancelLongPress = useCallback(() => {
     if (!longPress.current) return
@@ -162,6 +201,7 @@ export function Trigger({
 
   useEffect(() => cancelLongPress, [cancelLongPress])
 
+  const composedRef = useComposedRefs(ref, context.triggerRef)
   const Comp = asChild ? Slot.Root : "button"
 
   return (
@@ -176,16 +216,26 @@ export function Trigger({
       disabled={disabled}
       {...props}
       id={props.id ?? context.triggerId}
-      ref={composeRefs(ref, context.triggerRef)}
-      onPointerDown={composeHandlers(onPointerDown, (event) => {
-        if (disabled || context.isOpen()) return
+      ref={composedRef}
+      onPointerDown={(event) => {
+        if (callHandler(onPointerDown, event) || disabled || context.isOpen())
+          return
         const { clientX: x, clientY: y, pointerId } = event
 
         if (openOn === "press") {
           // Ctrl + click is a context click on macOS.
-          if (event.pointerType === "mouse" && (event.button !== 0 || event.ctrlKey)) return
+          if (
+            event.pointerType === "mouse" &&
+            (event.button !== 0 || event.ctrlKey)
+          )
+            return
           event.preventDefault()
-          context.openAt({ point: { x, y }, source: "pointer", pressed: true, pointerId })
+          context.openAt({
+            point: { x, y },
+            source: "pointer",
+            pressed: true,
+            pointerId,
+          })
           return
         }
 
@@ -197,18 +247,33 @@ export function Trigger({
           y,
           timer: window.setTimeout(() => {
             longPress.current = null
-            context.openAt({ point: { x, y }, source: "pointer", pressed: true, pointerId })
+            context.openAt({
+              point: { x, y },
+              source: "pointer",
+              pressed: true,
+              pointerId,
+            })
           }, LONG_PRESS_MS),
         }
-      })}
-      onPointerMove={composeHandlers(onPointerMove, (event) => {
+      }}
+      onPointerMove={(event) => {
+        if (callHandler(onPointerMove, event)) return
         const pending = longPress.current
         if (!pending || pending.pointerId !== event.pointerId) return
-        if (Math.hypot(event.clientX - pending.x, event.clientY - pending.y) > LONG_PRESS_TOLERANCE) cancelLongPress()
-      })}
-      onPointerUp={composeHandlers(onPointerUp, cancelLongPress)}
-      onPointerCancel={composeHandlers(onPointerCancel, cancelLongPress)}
-      onContextMenu={composeHandlers(onContextMenu, (event) => {
+        if (
+          Math.hypot(event.clientX - pending.x, event.clientY - pending.y) >
+          LONG_PRESS_TOLERANCE
+        )
+          cancelLongPress()
+      }}
+      onPointerUp={(event) => {
+        if (!callHandler(onPointerUp, event)) cancelLongPress()
+      }}
+      onPointerCancel={(event) => {
+        if (!callHandler(onPointerCancel, event)) cancelLongPress()
+      }}
+      onContextMenu={(event) => {
+        if (callHandler(onContextMenu, event)) return
         if (context.isOpen()) {
           event.preventDefault()
           return
@@ -222,20 +287,27 @@ export function Trigger({
           // macOS fires this on press, Windows on release.
           pressed: event.buttons !== 0,
         })
-      })}
-      onKeyDown={composeHandlers(onKeyDown, (event) => {
-        if (disabled) return
-        const menuKey = event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")
-        const activate = openOn === "press" && (event.key === "Enter" || event.key === " ")
+      }}
+      onKeyDown={(event) => {
+        if (callHandler(onKeyDown, event) || disabled) return
+        const menuKey =
+          event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")
+        const onTrigger =
+          openOn === "press" || event.target === event.currentTarget
+        const activate =
+          onTrigger && (event.key === "Enter" || event.key === " ")
         if (!menuKey && !activate) return
         event.preventDefault()
         const rect = event.currentTarget.getBoundingClientRect()
         context.openAt({
-          point: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+          point: {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          },
           source: "keyboard",
           pressed: false,
         })
-      })}
+      }}
     />
   )
 }
@@ -267,7 +339,8 @@ const ContentContext = createContext<ContentContextValue | null>(null)
 
 function useContentContext(consumer: string) {
   const context = use(ContentContext)
-  if (!context) throw new Error(`<${consumer}> must be used inside <PieMenuContent>.`)
+  if (!context)
+    throw new Error(`<${consumer}> must be used inside <PieMenuContent>.`)
   return context
 }
 
@@ -299,8 +372,14 @@ export function Content({ container, ...props }: PieMenuContentProps) {
   const request = root.request ?? requestFromTrigger(root.triggerRef.current)
 
   return createPortal(
-    <ContentImpl key={request.key} {...props} request={request} status={status} menuRef={menuRef} />,
-    container ?? document.body,
+    <ContentImpl
+      key={request.key}
+      {...props}
+      request={request}
+      status={status}
+      menuRef={menuRef}
+    />,
+    container ?? document.body
   )
 }
 
@@ -353,16 +432,28 @@ function ContentImpl({
     pressed: false,
   })
 
-  const [aimStore] = useState(() =>
-    createAimStore((aim) => {
-      const menu = menuRef.current
-      if (!menu) return
-      for (const [name, value] of Object.entries(aimStyle(aim))) menu.style.setProperty(name, value)
-    }),
+  const [aimStore] = useState(createAimStore)
+
+  // Mirror the aim into CSS variables on the menu element, with no React render.
+  useLayoutEffect(
+    () =>
+      aimStore.subscribe(() => {
+        const menu = menuRef.current
+        if (!menu) return
+        for (const [name, value] of Object.entries(aimStyle(aimStore.get())))
+          menu.style.setProperty(name, value)
+      }),
+    [aimStore, menuRef]
   )
 
-  const layouts = useMemo(() => layoutItems(items.length, radius, startRadians), [items.length, radius, startRadians])
-  const layoutById = useMemo(() => new Map(items.map((item, index) => [item.id, layouts[index]!])), [items, layouts])
+  const layouts = useMemo(
+    () => layoutItems(items.length, radius, startRadians),
+    [items.length, radius, startRadians]
+  )
+  const layoutById = useMemo(
+    () => new Map(items.map((item, index) => [item.id, layouts[index]!])),
+    [items, layouts]
+  )
 
   const itemsRef = useLatest(items)
   const layoutsRef = useLatest(layouts)
@@ -370,8 +461,14 @@ function ContentImpl({
   const onEscapeKeyDownRef = useLatest(onEscapeKeyDown)
 
   const register = useCallback((record: ItemRecord) => {
-    setItems((current) => sortByDocumentPosition([...current.filter((item) => item.id !== record.id), record]))
-    return () => setItems((current) => current.filter((item) => item.id !== record.id))
+    setItems((current) =>
+      sortByDocumentPosition([
+        ...current.filter((item) => item.id !== record.id),
+        record,
+      ])
+    )
+    return () =>
+      setItems((current) => current.filter((item) => item.id !== record.id))
   }, [])
 
   /** Pointer highlights come with a pointer aim. Keyboard highlights aim at the item. */
@@ -384,30 +481,41 @@ function ContentImpl({
         setHighlightedId(id)
         itemsRef.current[index]?.onHighlight.current?.()
       }
-      const target = index === -1 ? menuRef.current : itemsRef.current[index]!.element
+      const target =
+        index === -1 ? menuRef.current : itemsRef.current[index]!.element
       if (target && document.activeElement !== target) focus(target, source)
       if (source === "keyboard") {
         const layout = layoutsRef.current[index]
-        aimStore.set(layout ? aimFromVector(layout.sin, -layout.cos, 1) : IDLE_AIM)
+        aimStore.set(
+          layout ? aimFromVector(layout.sin, -layout.cos, 1) : IDLE_AIM
+        )
       }
     },
-    [aimStore, itemsRef, layoutsRef, menuRef],
+    [aimStore, itemsRef, layoutsRef, menuRef]
   )
 
   const select = useCallback(
     (id: string, originalEvent: Event) => {
       const item = itemsRef.current.find((record) => record.id === id)
       if (!item || item.disabled) return
-      const event = new CustomEvent("piemenu.select", { cancelable: true, detail: { originalEvent } })
+      const event = new CustomEvent("piemenu.select", {
+        cancelable: true,
+        detail: { originalEvent },
+      })
       item.onSelect.current?.(event)
       if (event.defaultPrevented) {
-        gesture.current = { ...gesture.current, mode: "sticky", pointerId: undefined, pressed: false }
+        gesture.current = {
+          ...gesture.current,
+          mode: "sticky",
+          pointerId: undefined,
+          pressed: false,
+        }
         return
       }
       setSelectedId(id)
       root.close()
     },
-    [itemsRef, root],
+    [itemsRef, root]
   )
 
   // Keep the whole menu inside the viewport: shrink it when it is too big, then move it.
@@ -415,20 +523,35 @@ function ContentImpl({
   useLayoutEffect(() => {
     const menu = menuRef.current
     if (!menu) return
-    const sizes = items.map(({ element }) => ({ width: element.offsetWidth, height: element.offsetHeight }))
-    const centerElement = menu.querySelector<HTMLElement>("[data-pie-menu-center]")
+    const sizes = items.map(({ element }) => ({
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+    }))
+    const centerElement = menu.querySelector<HTMLElement>(
+      "[data-pie-menu-center]"
+    )
     const centerSize = centerElement
       ? { width: centerElement.offsetWidth, height: centerElement.offsetHeight }
       : undefined
     const html = document.documentElement
-    const viewport = { width: html.clientWidth || window.innerWidth, height: html.clientHeight || window.innerHeight }
+    const viewport = {
+      width: html.clientWidth || window.innerWidth,
+      height: html.clientHeight || window.innerHeight,
+    }
     const extents = menuExtents(layouts, sizes, centerSize)
     const scale = fitScale(extents, viewport, collisionPadding)
-    const center = clampCenter(request.point, scaleExtents(extents, scale), viewport, collisionPadding)
+    const center = clampCenter(
+      request.point,
+      scaleExtents(extents, scale),
+      viewport,
+      collisionPadding
+    )
     setFit((current) =>
-      current.scale === scale && current.center.x === center.x && current.center.y === center.y
+      current.scale === scale &&
+      current.center.x === center.x &&
+      current.center.y === center.y
         ? current
-        : { center, scale },
+        : { center, scale }
     )
   }, [items, layouts, request.point, collisionPadding, menuRef])
 
@@ -451,7 +574,10 @@ function ContentImpl({
     if (root.open || !returnFocus) return
     const active = document.activeElement
     const trigger = root.triggerRef.current
-    if (trigger && (!active || active === document.body || menuRef.current?.contains(active))) {
+    if (
+      trigger &&
+      (!active || active === document.body || menuRef.current?.contains(active))
+    ) {
       focus(trigger, lastInput.current)
     }
   }, [root.open, root.triggerRef, returnFocus, menuRef])
@@ -463,7 +589,8 @@ function ContentImpl({
 
     const track = (event: PointerEvent) => {
       const current = gesture.current
-      const reference = current.mode === "drag" ? current.origin : fitRef.current.center
+      const reference =
+        current.mode === "drag" ? current.origin : fitRef.current.center
       const dx = event.clientX - reference.x
       const dy = event.clientY - reference.y
       const distance = Math.hypot(dx, dy)
@@ -471,13 +598,20 @@ function ContentImpl({
       aimStore.set(aimFromVector(dx, dy, radius * fitRef.current.scale))
 
       const records = itemsRef.current
-      const hovered = event.target instanceof Element ? event.target.closest("[data-pie-menu-item]") : null
-      const hoveredItem = hovered ? records.find((item) => item.element === hovered) : undefined
+      const hovered =
+        event.target instanceof Element
+          ? event.target.closest("[data-pie-menu-item]")
+          : null
+      const hoveredItem = hovered
+        ? records.find((item) => item.element === hovered)
+        : undefined
       // The dead zone never highlights. This matters on open: items start stacked at the
       // center, right under the pointer, so the element under it can be an item.
       let next: ItemRecord | undefined
       if (distance > deadZone) {
-        next = hoveredItem ?? records[wedgeIndex(vectorAngle(dx, dy), records.length, startRadians)]
+        next =
+          hoveredItem ??
+          records[wedgeIndex(vectorAngle(dx, dy), records.length, startRadians)]
       }
       highlight(next && !next.disabled ? next.id : null, "pointer")
       return distance
@@ -490,7 +624,8 @@ function ContentImpl({
     }
 
     const ownsPointer = (event: PointerEvent) =>
-      gesture.current.pointerId === undefined || gesture.current.pointerId === event.pointerId
+      gesture.current.pointerId === undefined ||
+      gesture.current.pointerId === event.pointerId
 
     const onPointerMove = (event: PointerEvent) => {
       if (gesture.current.mode === "drag" && !ownsPointer(event)) return
@@ -514,7 +649,8 @@ function ContentImpl({
         track(event)
         // A click that stays in the center leaves the menu open for a second click.
         if (current.leftDeadZone) commit(event)
-        else gesture.current = { ...current, mode: "sticky", pointerId: undefined }
+        else
+          gesture.current = { ...current, mode: "sticky", pointerId: undefined }
         return
       }
       if (!current.pressed) return
@@ -541,7 +677,17 @@ function ContentImpl({
       window.removeEventListener("resize", close)
       window.removeEventListener("blur", close)
     }
-  }, [root, deadZone, radius, startRadians, aimStore, highlight, select, itemsRef, fitRef])
+  }, [
+    root,
+    deadZone,
+    radius,
+    startRadians,
+    aimStore,
+    highlight,
+    select,
+    itemsRef,
+    fitRef,
+  ])
 
   // Keyboard input. Arrow keys pick by direction and combine for diagonals (Up + Right = north-east).
   useEffect(() => {
@@ -554,7 +700,9 @@ function ContentImpl({
       lastInput.current = "keyboard"
       const records = itemsRef.current
       const enabled = records.map((item) => !item.disabled)
-      const current = records.findIndex((item) => item.id === highlightedRef.current)
+      const current = records.findIndex(
+        (item) => item.id === highlightedRef.current
+      )
       const go = (index: number) => {
         const item = records[index]
         if (item) highlight(item.id, "keyboard")
@@ -569,14 +717,26 @@ function ContentImpl({
       } else if (event.key in ARROW_VECTORS) {
         event.preventDefault()
         arrows.add(event.key)
-        const vector = [...arrows].reduce((sum, key) => ({ x: sum.x + ARROW_VECTORS[key]!.x, y: sum.y + ARROW_VECTORS[key]!.y }), { x: 0, y: 0 })
+        const vector = [...arrows].reduce(
+          (sum, key) => ({
+            x: sum.x + ARROW_VECTORS[key]!.x,
+            y: sum.y + ARROW_VECTORS[key]!.y,
+          }),
+          { x: 0, y: 0 }
+        )
         if (vector.x === 0 && vector.y === 0) return
         const angles = layoutsRef.current.map((layout) => layout.angle)
         go(nearestIndex(vectorAngle(vector.x, vector.y), angles, enabled))
       } else if (event.key === "Tab") {
         event.preventDefault()
         const step = event.shiftKey ? -1 : 1
-        go(stepIndex(current === -1 ? (step === 1 ? -1 : 0) : current, step, enabled))
+        go(
+          stepIndex(
+            current === -1 ? (step === 1 ? -1 : 0) : current,
+            step,
+            enabled
+          )
+        )
       } else if (event.key === "Home") {
         event.preventDefault()
         go(stepIndex(-1, 1, enabled))
@@ -588,15 +748,28 @@ function ContentImpl({
         // A held key from the trigger must not select at once.
         if (event.repeat || !highlightedRef.current) return
         select(highlightedRef.current, event)
-      } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      } else if (
+        event.key.length === 1 &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey
+      ) {
         window.clearTimeout(typeaheadTimer)
-        typeaheadTimer = window.setTimeout(() => (typeahead = ""), TYPEAHEAD_RESET_MS)
+        typeaheadTimer = window.setTimeout(
+          () => (typeahead = ""),
+          TYPEAHEAD_RESET_MS
+        )
         typeahead += event.key.toLowerCase()
-        const start = typeahead.length === 1 ? current + 1 : Math.max(current, 0)
+        const start =
+          typeahead.length === 1 ? current + 1 : Math.max(current, 0)
         for (let offset = 0; offset < records.length; offset++) {
           const index = (start + offset) % records.length
           const item = records[index]!
-          if (!item.disabled && item.textValue.toLowerCase().startsWith(typeahead)) return go(index)
+          if (
+            !item.disabled &&
+            item.textValue.toLowerCase().startsWith(typeahead)
+          )
+            return go(index)
         }
       }
     }
@@ -623,23 +796,37 @@ function ContentImpl({
     return () => overlay.removeEventListener("wheel", prevent)
   }, [])
 
-  const highlightedLayout = highlightedId ? layoutById.get(highlightedId) : undefined
+  const highlightedLayout = highlightedId
+    ? layoutById.get(highlightedId)
+    : undefined
+  const overlayComposedRef = useComposedRefs(overlayProps?.ref, overlayRef)
+  const menuComposedRef = useComposedRefs(ref, menuRef)
+
   const contentContext = useMemo<ContentContextValue>(
     () => ({
       register,
       layoutById,
       highlightedId,
       selectedId,
-      highlightedAngle: highlightedLayout ? radToDeg(highlightedLayout.angle) : null,
+      highlightedAngle: highlightedLayout
+        ? radToDeg(highlightedLayout.angle)
+        : null,
       aimStore,
     }),
-    [register, layoutById, highlightedId, selectedId, highlightedLayout, aimStore],
+    [
+      register,
+      layoutById,
+      highlightedId,
+      selectedId,
+      highlightedLayout,
+      aimStore,
+    ]
   )
 
   return (
     <div
       {...overlayProps}
-      ref={composeRefs(overlayProps?.ref, overlayRef)}
+      ref={overlayComposedRef}
       role="presentation"
       data-pie-menu-overlay=""
       data-state={root.open ? "open" : "closed"}
@@ -650,12 +837,14 @@ function ContentImpl({
         pointerEvents: status === "ending" ? "none" : undefined,
         ...overlayProps?.style,
       }}
-      onContextMenu={composeHandlers(overlayProps?.onContextMenu, (event) => event.preventDefault())}
+      onContextMenu={composeHandlers(overlayProps?.onContextMenu, (event) =>
+        event.preventDefault()
+      )}
     >
       <div
         aria-labelledby={menuProps["aria-label"] ? undefined : root.triggerId}
         {...menuProps}
-        ref={composeRefs(ref, menuRef)}
+        ref={menuComposedRef}
         id={root.contentId}
         role="menu"
         tabIndex={-1}
@@ -696,7 +885,10 @@ const ARROW_VECTORS: Record<string, Point> = {
  * Pointer users get no ring, keyboard users do.
  */
 function focus(element: HTMLElement, source: OpenSource) {
-  element.focus({ preventScroll: true, focusVisible: source === "keyboard" } as FocusOptions)
+  element.focus({
+    preventScroll: true,
+    focusVisible: source === "keyboard",
+  } as FocusOptions)
 }
 
 function requestFromTrigger(trigger: HTMLElement | null): OpenRequest {
@@ -709,7 +901,10 @@ function requestFromTrigger(trigger: HTMLElement | null): OpenRequest {
 
 function sortByDocumentPosition(records: ItemRecord[]) {
   return records.sort((a, b) =>
-    a.element.compareDocumentPosition(b.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+    a.element.compareDocumentPosition(b.element) &
+    Node.DOCUMENT_POSITION_FOLLOWING
+      ? -1
+      : 1
   )
 }
 
@@ -717,7 +912,10 @@ function sortByDocumentPosition(records: ItemRecord[]) {
  * Item
  * -----------------------------------------------------------------------------------------------*/
 
-export interface PieMenuItemProps extends Omit<ComponentProps<"div">, "onSelect"> {
+export interface PieMenuItemProps extends Omit<
+  ComponentProps<"div">,
+  "onSelect"
+> {
   disabled?: boolean
   /** Text for typeahead. Defaults to the text content of the item. */
   textValue?: string
@@ -727,7 +925,15 @@ export interface PieMenuItemProps extends Omit<ComponentProps<"div">, "onSelect"
   onHighlight?: () => void
 }
 
-export function Item({ disabled = false, textValue, onSelect, onHighlight, ref, style, ...props }: PieMenuItemProps) {
+export function Item({
+  disabled = false,
+  textValue,
+  onSelect,
+  onHighlight,
+  ref,
+  style,
+  ...props
+}: PieMenuItemProps) {
   const context = useContentContext("PieMenuItem")
   const id = useId()
   const elementRef = useRef<HTMLDivElement | null>(null)
@@ -758,12 +964,13 @@ export function Item({ disabled = false, textValue, onSelect, onHighlight, ref, 
     })
   }, [register, id, disabled, textValue, onSelectRef, onHighlightRef])
 
+  const composedRef = useComposedRefs(ref, elementRef)
   const layout = context.layoutById.get(id)
 
   return (
     <div
       {...props}
-      ref={composeRefs(ref, elementRef)}
+      ref={composedRef}
       id={id}
       role="menuitem"
       tabIndex={-1}
@@ -773,7 +980,13 @@ export function Item({ disabled = false, textValue, onSelect, onHighlight, ref, 
       data-highlighted={context.highlightedId === id ? "" : undefined}
       data-selected={context.selectedId === id ? "" : undefined}
       data-starting-style={starting ? "" : undefined}
-      style={{ position: "absolute", left: 0, top: 0, ...(layout && itemStyle(layout)), ...style }}
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        ...(layout && itemStyle(layout)),
+        ...style,
+      }}
     />
   )
 }
@@ -824,7 +1037,15 @@ export function Indicator({ style, ...props }: ComponentProps<"div">) {
       {...props}
       data-pie-menu-indicator=""
       data-visible={highlightedAngle !== null ? "" : undefined}
-      style={{ position: "absolute", left: 0, top: 0, "--pie-indicator-rotate": `${rotation}deg`, ...style } as CSSProperties}
+      style={
+        {
+          position: "absolute",
+          left: 0,
+          top: 0,
+          "--pie-indicator-rotate": `${rotation}deg`,
+          ...style,
+        } as CSSProperties
+      }
     />
   )
 }

@@ -5,7 +5,13 @@ import { cn } from "@/lib/utils"
 
 import { copyText } from "./clipboard"
 
-export function CodeBlock({ code, className }: { code: string; className?: string }) {
+export function CodeBlock({
+  code,
+  className,
+}: {
+  code: string
+  className?: string
+}) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {

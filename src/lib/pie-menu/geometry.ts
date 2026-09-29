@@ -52,7 +52,11 @@ export function itemAngle(index: number, count: number, startAngle = 0) {
   return normalizeAngle(startAngle + (index * TAU) / count)
 }
 
-export function layoutItems(count: number, radius: number, startAngle = 0): ItemLayout[] {
+export function layoutItems(
+  count: number,
+  radius: number,
+  startAngle = 0
+): ItemLayout[] {
   return Array.from({ length: count }, (_, index) => {
     const angle = itemAngle(index, count, startAngle)
     const sin = Math.sin(angle)
@@ -69,7 +73,11 @@ export function wedgeIndex(angle: number, count: number, startAngle = 0) {
 }
 
 /** Index of the enabled item closest to the angle, or -1 when no item is enabled. */
-export function nearestIndex(angle: number, angles: readonly number[], enabled: readonly boolean[]) {
+export function nearestIndex(
+  angle: number,
+  angles: readonly number[],
+  enabled: readonly boolean[]
+) {
   let best = -1
   let bestDistance = Infinity
   angles.forEach((itemAngle, index) => {
@@ -84,7 +92,11 @@ export function nearestIndex(angle: number, angles: readonly number[], enabled: 
 }
 
 /** Next enabled index when walking the ring. Returns -1 when no item is enabled. */
-export function stepIndex(from: number, step: 1 | -1, enabled: readonly boolean[]) {
+export function stepIndex(
+  from: number,
+  step: 1 | -1,
+  enabled: readonly boolean[]
+) {
   const count = enabled.length
   for (let offset = 1; offset <= count; offset++) {
     const index = (((from + step * offset) % count) + count) % count
@@ -118,7 +130,11 @@ export interface Extents {
 }
 
 /** Bounding box of all item boxes and a centered box, relative to the menu center. */
-export function menuExtents(layouts: readonly ItemLayout[], sizes: readonly Size[], centerSize?: Size): Extents {
+export function menuExtents(
+  layouts: readonly ItemLayout[],
+  sizes: readonly Size[],
+  centerSize?: Size
+): Extents {
   const extents: Extents = { left: 0, right: 0, top: 0, bottom: 0 }
   const include = (left: number, top: number, size: Size) => {
     extents.left = Math.min(extents.left, left)
@@ -130,17 +146,31 @@ export function menuExtents(layouts: readonly ItemLayout[], sizes: readonly Size
     const size = sizes[index]
     if (!size) return
     const offset = anchorOffset(layout.sin, layout.cos)
-    include(layout.x + offset.x * size.width, layout.y + offset.y * size.height, size)
+    include(
+      layout.x + offset.x * size.width,
+      layout.y + offset.y * size.height,
+      size
+    )
   })
-  if (centerSize) include(-centerSize.width / 2, -centerSize.height / 2, centerSize)
+  if (centerSize)
+    include(-centerSize.width / 2, -centerSize.height / 2, centerSize)
   return extents
 }
 
 /** Scale that makes the menu fit inside the viewport, never above 1 and never below `min`. */
-export function fitScale(extents: Extents, viewport: Size, padding = 8, min = 0.5) {
+export function fitScale(
+  extents: Extents,
+  viewport: Size,
+  padding = 8,
+  min = 0.5
+) {
   const width = extents.right - extents.left
   const height = extents.bottom - extents.top
-  const scale = Math.min(1, (viewport.width - padding * 2) / width, (viewport.height - padding * 2) / height)
+  const scale = Math.min(
+    1,
+    (viewport.width - padding * 2) / width,
+    (viewport.height - padding * 2) / height
+  )
   return Math.max(min, Number.isFinite(scale) ? scale : 1)
 }
 
@@ -154,12 +184,27 @@ export function scaleExtents(extents: Extents, scale: number): Extents {
 }
 
 /** Moves the center so the whole menu stays inside the viewport. */
-export function clampCenter(point: Point, extents: Extents, viewport: Size, padding = 8): Point {
+export function clampCenter(
+  point: Point,
+  extents: Extents,
+  viewport: Size,
+  padding = 8
+): Point {
   const clampAxis = (value: number, min: number, max: number, size: number) =>
     min > max ? size / 2 : Math.min(Math.max(value, min), max)
   return {
-    x: clampAxis(point.x, padding - extents.left, viewport.width - padding - extents.right, viewport.width),
-    y: clampAxis(point.y, padding - extents.top, viewport.height - padding - extents.bottom, viewport.height),
+    x: clampAxis(
+      point.x,
+      padding - extents.left,
+      viewport.width - padding - extents.right,
+      viewport.width
+    ),
+    y: clampAxis(
+      point.y,
+      padding - extents.top,
+      viewport.height - padding - extents.bottom,
+      viewport.height
+    ),
   }
 }
 

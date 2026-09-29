@@ -13,7 +13,10 @@ export async function copyText(text: string) {
 }
 
 function copyWithTextArea(text: string) {
-  const active = document.activeElement instanceof HTMLElement ? document.activeElement : null
+  const active =
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
   const area = document.createElement("textarea")
   area.value = text
   area.setAttribute("readonly", "")

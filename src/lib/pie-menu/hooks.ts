@@ -23,7 +23,7 @@ export function useControllableState<T>(options: {
       if (!isControlled) setUncontrolled(next)
       if (!Object.is(next, value)) onChange.current?.(next)
     },
-    [isControlled, value, onChange],
+    [isControlled, value, onChange]
   )
 
   return [value, setValue] as const
@@ -47,10 +47,30 @@ export function composeRefs<T>(...refs: Array<Ref<T> | undefined>) {
   }
 }
 
+/** A stable callback ref that sets both refs. */
+export function useComposedRefs<T>(
+  a: Ref<T> | undefined,
+  b: Ref<T> | undefined
+) {
+  return useCallback((node: T | null) => composeRefs(a, b)(node), [a, b])
+}
+
+/**
+ * Calls the user handler. Returns true when the user prevented the default,
+ * so the caller can skip its own handling.
+ */
+export function callHandler<E extends { defaultPrevented: boolean }>(
+  handler: ((event: E) => void) | undefined,
+  event: E
+) {
+  handler?.(event)
+  return event.defaultPrevented
+}
+
 /** Calls the user handler first. The internal handler runs unless the user prevented it. */
 export function composeHandlers<E extends { defaultPrevented: boolean }>(
   userHandler: ((event: E) => void) | undefined,
-  ownHandler: (event: E) => void,
+  ownHandler: (event: E) => void
 ) {
   return (event: E) => {
     userHandler?.(event)
