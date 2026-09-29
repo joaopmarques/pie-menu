@@ -49,6 +49,8 @@ Before you finish any change, run `pnpm typecheck`, `pnpm test`, and `pnpm build
 | `media/video/` | The page and script that record the demo videos. |
 | `public/r/` | The built registry. It is committed, because Vercel serves it. |
 | `public/llms.txt`, `public/llms-full.txt` | Summaries for LLM search, in the llmstxt.org format. |
+| `public/favicon.svg` | The favicon: a pie emoji (🥧) in an SVG. |
+| `LICENSE` | The MIT license. |
 | `registry.json` | The registry manifest. |
 
 ## How the component works
@@ -195,7 +197,7 @@ Check the facts against the code, not against other docs. The prop names live in
 ## Rules
 
 - Do not use "The Sims" branding: no "Sims" or "Sim" wording and no green diamond (plumbob). EA owns them. Use "life-sim room", "the character", and the thought bubble.
-- The project has no license yet. Do not claim one in any file. The owner decides.
+- The license is MIT, in `LICENSE` (Copyright (c) 2026 João P. Marques). The README, both llms files, `package.json`, and the JSON-LD state it. Keep them in step if the license ever changes.
 - Do not commit, push, or deploy unless the owner asks for it.
 - Write all prose in ASD-STE100 Simplified Technical English: short sentences, active voice, no contractions, no semicolons, and no marketing adjectives. This covers docs, code comments, commit messages, and page text.
 - Match the surrounding code: its naming, its comment density, and its idioms.

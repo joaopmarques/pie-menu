@@ -281,3 +281,7 @@ The landing page has a demo video, a life-sim room, a context menu, an icon-only
 
 - Submenus (nested pies).
 - Mark-ahead mode, where a fast flick selects before the menu shows.
+
+## License
+
+MIT. Copyright (c) 2026 João P. Marques. See [LICENSE](LICENSE).

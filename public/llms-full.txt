@@ -263,3 +263,7 @@ The parts are `Root`, `Trigger`, `Content`, `Item`, `Center`, and `Indicator`, p
 
 - Submenus (nested pies).
 - Mark-ahead mode, where a fast flick selects before the menu shows.
+
+## License
+
+MIT. Copyright (c) 2026 João P. Marques. The license text is at https://github.com/joaopmarques/pie-menu/blob/main/LICENSE.
