@@ -3,7 +3,7 @@ import { Crosshair, Focus, Keyboard, Maximize, MousePointerClick, Sparkles } fro
 
 import { CodeBlock } from "./code-block"
 
-const INSTALL = "npx shadcn@latest add https://your-host/r/pie-menu.json"
+const INSTALL = "npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json"
 
 const BASIC_USAGE = `<PieMenu>
   <PieMenuTrigger>Edit</PieMenuTrigger>
@@ -38,6 +38,8 @@ const EXTRAS = [
   ["<PieMenuCenter>", "Puts anything in the middle. The character's head in the demo goes here."],
   ['variant="destructive"', "Makes an item red."],
   ["disabled", "Grays an item out. Its slice stays in place but does nothing."],
+  ["onHighlight", "Runs when an item becomes highlighted, by pointer or by keyboard."],
+  ["Live items", "Render a new item while the menu is open. The ring makes room, and the item grows in."],
 ]
 
 const FREEBIES = [

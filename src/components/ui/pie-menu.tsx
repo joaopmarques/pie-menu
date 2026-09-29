@@ -65,6 +65,8 @@ function PieMenuItem({
         // Enter: grow out of the center, one item after another.
         "group-data-entering/pie-menu:delay-[calc(var(--pie-item-index)*16ms)]",
         "group-data-starting-style/pie-menu:opacity-0 motion-safe:group-data-starting-style/pie-menu:scale-50 motion-safe:group-data-starting-style/pie-menu:[translate:-50%_-50%]",
+        // An item added while the menu is open grows out of the center on its own.
+        "data-starting-style:opacity-0 motion-safe:data-starting-style:scale-50 motion-safe:data-starting-style:[translate:-50%_-50%]",
         // Exit: the chosen item lingers and swells, the others fold back in.
         "group-data-ending-style/pie-menu:opacity-0",
         "group-data-ending-style/pie-menu:not-data-selected:duration-150 motion-safe:group-data-ending-style/pie-menu:not-data-selected:scale-75 motion-safe:group-data-ending-style/pie-menu:not-data-selected:[translate:-50%_-50%]",

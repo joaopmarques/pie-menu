@@ -1,6 +1,20 @@
-# Pie Menu
+# Pie Menu: full usage docs
 
-A radial menu for React in the shadcn/ui style. Items sit in a ring around the pointer, so each one is a short flick away. The design follows the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986), and the marking menus of Gordon Kurtenbach and Bill Buxton.
+> Pie Menu is a radial menu component for React. It is a shadcn/ui registry item. Items sit in a ring around the pointer. The user presses, drags toward an item, and releases.
+
+- Landing page: https://piemenu.jpmarqu.es
+- Registry item: https://piemenu.jpmarqu.es/r/pie-menu.json
+- Source: https://github.com/joaopmarques/pie-menu
+- Author: João P. Marques (https://jpmarqu.es)
+
+## Requirements
+
+- React 19.
+- Tailwind CSS v4.
+- A shadcn/ui project. The component uses the `cn` helper from the shadcn/ui `utils` item.
+- The only runtime dependency is `radix-ui`, for `Slot`. The shadcn CLI installs it.
+
+## Features
 
 - Press, drag toward an item, and release. Or click, then click an item.
 - Full keyboard support, with ARIA menu roles and focus management.
@@ -9,8 +23,6 @@ A radial menu for React in the shadcn/ui style. Items sit in a ring around the p
 - A headless primitive and a styled shadcn/ui layer, in separate files.
 - `onHighlight` on each item, for pointer and keyboard highlights.
 - Items can join while the menu is open. The ring re-flows, and the new item transitions in.
-
-Live demo and guide: https://piemenu.jpmarqu.es
 
 ## Install
 
@@ -245,28 +257,6 @@ export function SnackMenu() {
 ```
 
 The parts are `Root`, `Trigger`, `Content`, `Item`, `Center`, and `Indicator`, plus the `usePieMenuAim()` hook. They take the same props as the styled parts, except `variant`, which only the styled layer has. The maximalist example on the landing page uses this approach. Its source is `src/demo/maximalist-demo.tsx` and `src/demo/maximalist.css`.
-
-## Demo
-
-```bash
-pnpm install
-```
-
-```bash
-pnpm dev
-```
-
-The landing page has a demo video, a life-sim room, a context menu, an icon-only menu, and a maximalist menu. In the life-sim room, each object opens a pie with the character's head at the center. The head follows the aim through the `--pie-aim-*` variables. See `src/demo/character.tsx` and `src/demo/demo.css`.
-
-## Scripts
-
-| Script | Action |
-| --- | --- |
-| `pnpm dev` | Start the demo. |
-| `pnpm test` | Run the unit and interaction tests. |
-| `pnpm typecheck` | Type-check the project. |
-| `pnpm build` | Build the demo. |
-| `pnpm registry:build` | Write the registry files to `public/r`. |
 
 ## Not yet supported
 

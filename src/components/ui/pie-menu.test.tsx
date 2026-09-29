@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
@@ -175,6 +176,68 @@ describe("PieMenu", () => {
     expect(screen.getByRole("menuitem", { name: "Right" })).not.toHaveAttribute("data-highlighted")
     act(() => void window.dispatchEvent(pointer("pointerup", 300, 200)))
     expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it("calls onHighlight when an item becomes highlighted", async () => {
+    const user = userEvent.setup()
+    const onHighlight = vi.fn()
+    render(
+      <PieMenu>
+        <PieMenuTrigger>Actions</PieMenuTrigger>
+        <PieMenuContent>
+          {["Up", "Right", "Down"].map((label) => (
+            <PieMenuItem key={label} onHighlight={() => onHighlight(label)}>
+              {label}
+            </PieMenuItem>
+          ))}
+        </PieMenuContent>
+      </PieMenu>,
+    )
+    screen.getByRole("button").focus()
+    await user.keyboard("{Enter}")
+    await user.keyboard("{Tab}")
+    expect(onHighlight.mock.calls).toEqual([["Up"], ["Right"]])
+  })
+
+  it("adds an item while the menu is open and keeps the highlight", async () => {
+    const user = userEvent.setup()
+
+    function Growing() {
+      const [extra, setExtra] = useState(false)
+      return (
+        <PieMenu>
+          <PieMenuTrigger>Actions</PieMenuTrigger>
+          <PieMenuContent>
+            <PieMenuItem>First</PieMenuItem>
+            <PieMenuItem onHighlight={() => setExtra(true)}>Second</PieMenuItem>
+            {extra && <PieMenuItem>New</PieMenuItem>}
+            <PieMenuItem>Last</PieMenuItem>
+          </PieMenuContent>
+        </PieMenu>
+      )
+    }
+
+    render(<Growing />)
+    screen.getByRole("button").focus()
+    await user.keyboard("{Enter}")
+    await user.keyboard("{Tab}")
+
+    // "New" goes between "Second" and "Last", and the ring re-flows to four slots.
+    const items = screen.getAllByRole("menuitem")
+    expect(items.map((item) => item.textContent)).toEqual(["First", "Second", "New", "Last"])
+    expect(items.map((item) => item.style.getPropertyValue("--pie-item-angle"))).toEqual([
+      "0deg",
+      "90deg",
+      "180deg",
+      "270deg",
+    ])
+    expect(screen.getByRole("menuitem", { name: "Second" })).toHaveFocus()
+
+    // The new item starts in the enter start state, then leaves it.
+    await waitFor(() => expect(screen.getByRole("menuitem", { name: "New" })).not.toHaveAttribute("data-starting-style"))
+
+    await user.keyboard("{Tab}")
+    expect(screen.getByRole("menuitem", { name: "New" })).toHaveFocus()
   })
 
   it("keeps the menu open when onSelect prevents the default", async () => {

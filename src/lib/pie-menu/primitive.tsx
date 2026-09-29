@@ -250,6 +250,7 @@ interface ItemRecord {
   disabled: boolean
   textValue: string
   onSelect: RefObject<((event: Event) => void) | undefined>
+  onHighlight: RefObject<(() => void) | undefined>
 }
 
 interface ContentContextValue {
@@ -377,11 +378,12 @@ function ContentImpl({
   const highlight = useCallback(
     (id: string | null, source: OpenSource) => {
       lastInput.current = source
+      const index = itemsRef.current.findIndex((item) => item.id === id)
       if (highlightedRef.current !== id) {
         highlightedRef.current = id
         setHighlightedId(id)
+        itemsRef.current[index]?.onHighlight.current?.()
       }
-      const index = itemsRef.current.findIndex((item) => item.id === id)
       const target = index === -1 ? menuRef.current : itemsRef.current[index]!.element
       if (target && document.activeElement !== target) focus(target, source)
       if (source === "keyboard") {
@@ -718,14 +720,27 @@ export interface PieMenuItemProps extends Omit<ComponentProps<"div">, "onSelect"
   textValue?: string
   /** Call `event.preventDefault()` to keep the menu open. */
   onSelect?: (event: Event) => void
+  /** Runs when the item becomes the highlighted item, by pointer or by keyboard. */
+  onHighlight?: () => void
 }
 
-export function Item({ disabled = false, textValue, onSelect, ref, style, ...props }: PieMenuItemProps) {
+export function Item({ disabled = false, textValue, onSelect, onHighlight, ref, style, ...props }: PieMenuItemProps) {
   const context = useContentContext("PieMenuItem")
   const id = useId()
   const elementRef = useRef<HTMLDivElement | null>(null)
   const onSelectRef = useLatest(onSelect)
+  const onHighlightRef = useLatest(onHighlight)
   const { register } = context
+
+  // An item can mount while the menu is open. It gets its own first frame in the
+  // start state, so it can transition in like the items that opened with the menu.
+  const [starting, setStarting] = useState(true)
+  useEffect(() => {
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setStarting(false))
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   useLayoutEffect(() => {
     const element = elementRef.current
@@ -736,8 +751,9 @@ export function Item({ disabled = false, textValue, onSelect, ref, style, ...pro
       disabled,
       textValue: textValue ?? element.textContent?.trim() ?? "",
       onSelect: onSelectRef,
+      onHighlight: onHighlightRef,
     })
-  }, [register, id, disabled, textValue, onSelectRef])
+  }, [register, id, disabled, textValue, onSelectRef, onHighlightRef])
 
   const layout = context.layoutById.get(id)
 
@@ -753,6 +769,7 @@ export function Item({ disabled = false, textValue, onSelect, ref, style, ...pro
       data-disabled={disabled ? "" : undefined}
       data-highlighted={context.highlightedId === id ? "" : undefined}
       data-selected={context.selectedId === id ? "" : undefined}
+      data-starting-style={starting ? "" : undefined}
       style={{ position: "absolute", left: 0, top: 0, ...(layout && itemStyle(layout)), ...style }}
     />
   )

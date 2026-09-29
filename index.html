@@ -3,13 +3,167 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pie Menu</title>
+    <title>Pie Menu: a radial menu for React and shadcn/ui</title>
+    <meta name="description" content="Pie Menu is a radial menu component for React 19 and Tailwind CSS v4. Install it from the shadcn/ui registry. Press, drag toward an item, and release." />
+    <meta name="author" content="João P. Marques" />
+    <link rel="canonical" href="https://piemenu.jpmarqu.es/" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly summary" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pie Menu" />
+    <meta property="og:title" content="Pie Menu: a radial menu for React and shadcn/ui" />
+    <meta property="og:description" content="Pie Menu is a radial menu component for React 19 and Tailwind CSS v4. Install it from the shadcn/ui registry. Press, drag toward an item, and release." />
+    <meta property="og:url" content="https://piemenu.jpmarqu.es/" />
+    <meta property="og:image" content="https://piemenu.jpmarqu.es/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pie Menu, a radial menu component for React and shadcn/ui." />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pie Menu: a radial menu for React and shadcn/ui" />
+    <meta name="twitter:description" content="Pie Menu is a radial menu component for React 19 and Tailwind CSS v4. Install it from the shadcn/ui registry. Press, drag toward an item, and release." />
+    <meta name="twitter:image" content="https://piemenu.jpmarqu.es/og.png" />
+    <meta name="twitter:image:alt" content="Pie Menu, a radial menu component for React and shadcn/ui." />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://piemenu.jpmarqu.es/#website",
+            "name": "Pie Menu",
+            "url": "https://piemenu.jpmarqu.es/",
+            "description": "Pie Menu is a radial menu component for React 19 and Tailwind CSS v4. Install it from the shadcn/ui registry. Press, drag toward an item, and release.",
+            "inLanguage": "en",
+            "author": {
+              "@id": "https://jpmarqu.es/#person"
+            }
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://piemenu.jpmarqu.es/#code",
+            "name": "Pie Menu",
+            "description": "A radial pie menu component for React, distributed as a shadcn/ui registry item. It supports press-drag-release selection, full keyboard support with ARIA menu roles, and enter and exit animations. Items report highlights with onHighlight, and items can be added while the menu is open. A headless primitive allows a fully custom look.",
+            "url": "https://piemenu.jpmarqu.es/",
+            "codeRepository": "https://github.com/joaopmarques/pie-menu",
+            "programmingLanguage": "TypeScript",
+            "runtimePlatform": "React 19",
+            "softwareRequirements": [
+              "React 19",
+              "Tailwind CSS v4",
+              "radix-ui"
+            ],
+            "keywords": [
+              "pie menu",
+              "radial menu",
+              "marking menu",
+              "React",
+              "shadcn/ui",
+              "shadcn registry",
+              "Tailwind CSS",
+              "TypeScript",
+              "accessibility",
+              "context menu",
+              "headless component",
+              "onHighlight",
+              "radial context menu"
+            ],
+            "author": {
+              "@type": "Person",
+              "@id": "https://jpmarqu.es/#person",
+              "name": "João P. Marques",
+              "url": "https://jpmarqu.es"
+            },
+            "targetProduct": {
+              "@type": "SoftwareApplication",
+              "name": "shadcn/ui",
+              "applicationCategory": "DeveloperApplication",
+              "url": "https://ui.shadcn.com"
+            },
+            "isPartOf": {
+              "@id": "https://piemenu.jpmarqu.es/#website"
+            },
+            "distribution": "https://piemenu.jpmarqu.es/r/pie-menu.json"
+          },
+          {
+            "@type": "HowTo",
+            "@id": "https://piemenu.jpmarqu.es/#howto",
+            "name": "Install and use Pie Menu in a shadcn/ui project",
+            "description": "Add the Pie Menu component with the shadcn CLI, then write four parts. The project must use React 19 and Tailwind CSS v4.",
+            "tool": [
+              {
+                "@type": "HowToTool",
+                "name": "shadcn CLI"
+              }
+            ],
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Install the component",
+                "text": "Run npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json in your shadcn/ui project. The command adds the component files and the radix-ui dependency."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Import the parts",
+                "text": "Import PieMenu, PieMenuTrigger, PieMenuContent, and PieMenuItem from @/components/ui/pie-menu."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Write the four parts",
+                "text": "Put a PieMenuTrigger and a PieMenuContent inside PieMenu. Put one PieMenuItem inside PieMenuContent for each option."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Handle the selection",
+                "text": "Give each PieMenuItem an onSelect handler. Items go clockwise from the top, in the order you write them."
+              },
+              {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Style it your way (optional)",
+                "text": "Edit the Tailwind classes in components/ui/pie-menu.tsx, or import the headless primitive from @/lib/pie-menu/primitive and write your own CSS against its data attributes and CSS variables."
+              }
+            ]
+          },
+          {
+            "@type": "VideoObject",
+            "@id": "https://piemenu.jpmarqu.es/#video",
+            "name": "Pie Menu demo",
+            "description": "A cursor opens a pie menu with Copy, Cut, Paste, Duplicate, Share, and Delete. It sweeps across the items, then picks Copy. Recorded at 120 frames per second.",
+            "thumbnailUrl": "https://piemenu.jpmarqu.es/media/pie-menu-demo-poster.jpg",
+            "contentUrl": "https://piemenu.jpmarqu.es/media/pie-menu-demo-120fps.mp4",
+            "uploadDate": "2026-09-29",
+            "duration": "PT8S",
+            "width": 1920,
+            "height": 1080,
+            "isPartOf": {
+              "@id": "https://piemenu.jpmarqu.es/#website"
+            }
+          }
+        ]
+      }
+    </script>
     <script>
-      // Follow the system color scheme, the same way shadcn/ui apps do with a .dark class.
-      const media = matchMedia("(prefers-color-scheme: dark)")
-      const apply = () => document.documentElement.classList.toggle("dark", media.matches)
-      apply()
-      media.addEventListener("change", apply)
+      // Set the theme before the first paint, so the page never flashes the wrong one.
+      // src/demo/theme.ts takes over after load. Keep the storage key in sync with it.
+      ;(() => {
+        let stored = null
+        try {
+          stored = localStorage.getItem("pie-menu-theme")
+        } catch {}
+        const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+        const theme = stored === "light" || stored === "dark" ? stored : system
+        document.documentElement.classList.toggle("dark", theme === "dark")
+        document.documentElement.style.colorScheme = theme
+      })()
     </script>
   </head>
   <body>

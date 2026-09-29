@@ -1,0 +1,398 @@
+/*
+ * The maximalist example. Plain CSS on top of the headless primitive.
+ * It reads the same data attributes and CSS variables as the shadcn/ui layer.
+ */
+
+:root {
+  --maxi-ink: #111111;
+  --maxi-paper: #fffdf5;
+  --maxi-sun: #ffe600;
+  --maxi-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --maxi-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark {
+  --maxi-ink: #fafafa;
+  --maxi-paper: #1f1b2e;
+}
+
+/* Stage and trigger */
+
+.maxi-stage {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1.25rem;
+  min-height: 34rem;
+  padding: 2rem 1rem;
+  border: 4px solid var(--maxi-ink);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle, color-mix(in oklch, #ff3d7f 35%, transparent) 2px, transparent 2.5px) 0 0 / 18px 18px,
+    color-mix(in oklch, var(--maxi-sun) 18%, var(--maxi-paper));
+}
+
+.maxi-trigger {
+  padding: 0.9rem 1.4rem;
+  border: 4px solid var(--maxi-ink);
+  border-radius: 1.1rem;
+  background: var(--maxi-sun);
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 6px 6px 0 var(--maxi-ink);
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  transition:
+    translate 160ms var(--maxi-out),
+    box-shadow 160ms var(--maxi-out);
+}
+
+.maxi-trigger:hover {
+  translate: -2px -2px;
+  box-shadow: 8px 8px 0 var(--maxi-ink);
+}
+
+.maxi-trigger[data-state="open"] {
+  translate: 4px 4px;
+  box-shadow: 2px 2px 0 var(--maxi-ink);
+}
+
+.maxi-trigger:focus-visible {
+  outline: 3px dashed var(--maxi-ink);
+  outline-offset: 5px;
+}
+
+.maxi-order {
+  min-height: 1.75rem;
+  color: var(--maxi-ink);
+  font-weight: 800;
+  text-align: center;
+}
+
+.maxi-order__pop {
+  display: inline-block;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  animation: maxi-pop 500ms var(--maxi-spring);
+}
+
+/* Menu */
+
+.maxi-menu {
+  /* The disc reaches past the item stickers, which are 112px wide. */
+  --maxi-disc-size: calc((var(--pie-radius) + 74px) * 2);
+  outline: none;
+}
+
+.maxi-disc {
+  width: var(--maxi-disc-size);
+  height: var(--maxi-disc-size);
+  translate: -50% -50%;
+  border: 4px solid var(--maxi-ink);
+  border-radius: 50%;
+  background: var(--maxi-disc);
+  box-shadow: 10px 10px 0 var(--maxi-ink);
+  transition:
+    rotate 560ms var(--maxi-spring),
+    scale 560ms var(--maxi-spring),
+    opacity 240ms ease-out;
+}
+
+.maxi-disc::after {
+  content: "";
+  position: absolute;
+  inset: 26px;
+  border: 3px dashed color-mix(in oklch, var(--maxi-ink) 35%, transparent);
+  border-radius: 50%;
+}
+
+.maxi-wedge {
+  width: var(--maxi-disc-size);
+  height: var(--maxi-disc-size);
+  translate: -50% -50%;
+  rotate: var(--pie-indicator-rotate);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    rotate 420ms var(--maxi-spring),
+    opacity 160ms ease-out;
+}
+
+.maxi-wedge[data-visible] {
+  opacity: 1;
+}
+
+.dark .maxi-wedge path {
+  fill: color-mix(in oklch, white 20%, transparent);
+}
+
+.maxi-wedge svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.maxi-wedge path {
+  fill: color-mix(in oklch, white 55%, transparent);
+  stroke: var(--maxi-ink);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.maxi-hub {
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  translate: -50% -50%;
+  border: 4px solid var(--maxi-ink);
+  border-radius: 50%;
+  background: #111111;
+  color: var(--maxi-sun);
+  box-shadow: 5px 5px 0 var(--maxi-ink);
+  transition:
+    scale 480ms var(--maxi-spring),
+    opacity 200ms ease-out;
+}
+
+/* The arrow follows the live pointer through --pie-aim-angle. */
+.maxi-hub__arrow {
+  position: absolute;
+  inset: 8px;
+  rotate: var(--pie-aim-angle, 0deg);
+  scale: calc(0.75 + var(--pie-aim-distance, 0) * 0.25);
+  opacity: calc(0.35 + var(--pie-aim-distance, 0) * 0.65);
+}
+
+.maxi-hub__arrow::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  translate: -50% 0;
+  border-right: 11px solid transparent;
+  border-bottom: 17px solid var(--maxi-sun);
+  border-left: 11px solid transparent;
+}
+
+.maxi-hub__text {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Items */
+
+.maxi-item {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 112px;
+  height: 112px;
+  translate: calc(var(--pie-item-x) - 50%) calc(var(--pie-item-y) - 50%);
+  border: 4px solid var(--maxi-ink);
+  border-radius: 50%;
+  background: var(--maxi-paper);
+  color: var(--maxi-ink);
+  box-shadow: 6px 6px 0 var(--maxi-ink);
+  cursor: default;
+  outline: none;
+  user-select: none;
+  transition:
+    translate 560ms var(--maxi-spring),
+    scale 380ms var(--maxi-spring),
+    rotate 380ms var(--maxi-spring),
+    opacity 220ms ease-out,
+    background-color 140ms ease-out,
+    box-shadow 140ms ease-out;
+}
+
+.maxi-item__emoji {
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.maxi-item__label {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.maxi-item[data-highlighted] {
+  z-index: 2;
+  background: var(--maxi-item);
+  color: #111111;
+  scale: 1.18;
+  rotate: -8deg;
+  box-shadow: 9px 9px 0 var(--maxi-ink);
+}
+
+.maxi-item[data-highlighted] .maxi-item__emoji {
+  animation: maxi-wobble 520ms ease-in-out infinite alternate;
+}
+
+.maxi-item:focus-visible {
+  outline: 3px dashed var(--maxi-ink);
+  outline-offset: 6px;
+}
+
+/* Enter: the disc spins in, and the items pop out one after another. */
+
+.maxi-menu[data-entering] .maxi-item {
+  transition-delay: calc(var(--pie-item-index) * 45ms);
+}
+
+.maxi-menu[data-starting-style] .maxi-disc {
+  rotate: -140deg;
+  scale: 0.2;
+  opacity: 0;
+}
+
+.maxi-menu[data-starting-style] .maxi-hub {
+  scale: 0;
+}
+
+.maxi-menu[data-starting-style] .maxi-item,
+.maxi-item[data-starting-style] {
+  translate: -50% -50%;
+  scale: 0.2;
+  rotate: -180deg;
+  opacity: 0;
+}
+
+/* Exit: the chosen item zooms out, everything else spins away. */
+
+.maxi-menu[data-ending-style] .maxi-disc {
+  rotate: 90deg;
+  scale: 0.3;
+  opacity: 0;
+  transition-duration: 280ms;
+  transition-timing-function: ease-in;
+}
+
+.maxi-menu[data-ending-style] .maxi-hub,
+.maxi-menu[data-ending-style] .maxi-wedge {
+  scale: 0.4;
+  opacity: 0;
+  transition-duration: 220ms;
+}
+
+.maxi-menu[data-ending-style] .maxi-item:not([data-selected]) {
+  translate: -50% -50%;
+  scale: 0.2;
+  rotate: 120deg;
+  opacity: 0;
+  transition-duration: 260ms;
+  transition-timing-function: ease-in;
+}
+
+.maxi-menu[data-ending-style] .maxi-item[data-selected] {
+  scale: 1.8;
+  rotate: 0deg;
+  opacity: 0;
+  transition-duration: 420ms;
+}
+
+/* The easter egg. The secret item arrives with a bounce and glows in rainbow colors. */
+
+.maxi-menu[data-surprise] .maxi-disc {
+  animation: maxi-boing 700ms var(--maxi-spring);
+}
+
+.maxi-item[data-secret] {
+  border-style: dashed;
+}
+
+.maxi-item[data-secret] .maxi-item__label {
+  max-width: 88px;
+  font-size: 0.68rem;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-align: center;
+  hyphens: manual;
+}
+
+.maxi-item[data-secret][data-highlighted] {
+  background: conic-gradient(from 0deg, #ff3d7f, #ffb300, #ffe600, #00c2a8, #3b82f6, #a855f7, #ff3d7f);
+  animation: maxi-glow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes maxi-boing {
+  40% {
+    scale: 1.08;
+    rotate: 10deg;
+  }
+  70% {
+    scale: 0.97;
+    rotate: -4deg;
+  }
+}
+
+@keyframes maxi-glow {
+  to {
+    box-shadow:
+      9px 9px 0 var(--maxi-ink),
+      0 0 32px 8px color-mix(in oklch, #ff4fd8 55%, transparent);
+  }
+}
+
+@keyframes maxi-wobble {
+  from {
+    rotate: -12deg;
+    scale: 1;
+  }
+  to {
+    rotate: 12deg;
+    scale: 1.15;
+  }
+}
+
+@keyframes maxi-pop {
+  from {
+    scale: 0.4;
+    rotate: -6deg;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maxi-disc,
+  .maxi-wedge,
+  .maxi-hub,
+  .maxi-item,
+  .maxi-trigger {
+    transition-property: opacity, background-color, box-shadow;
+  }
+  .maxi-item[data-highlighted] .maxi-item__emoji,
+  .maxi-order__pop,
+  .maxi-menu[data-surprise] .maxi-disc,
+  .maxi-item[data-secret][data-highlighted] {
+    animation: none;
+  }
+  /* Nothing moves in or out. Items only fade in place. */
+  .maxi-menu[data-starting-style] .maxi-item,
+  .maxi-item[data-starting-style],
+  .maxi-menu[data-ending-style] .maxi-item {
+    translate: calc(var(--pie-item-x) - 50%) calc(var(--pie-item-y) - 50%);
+    scale: 1;
+    rotate: 0deg;
+  }
+  .maxi-menu[data-starting-style] .maxi-disc,
+  .maxi-menu[data-ending-style] .maxi-disc,
+  .maxi-menu[data-starting-style] .maxi-hub,
+  .maxi-menu[data-ending-style] .maxi-hub,
+  .maxi-menu[data-ending-style] .maxi-wedge {
+    rotate: 0deg;
+    scale: 1;
+  }
+}

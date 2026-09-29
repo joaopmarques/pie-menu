@@ -1,9 +1,15 @@
 import type { ReactNode } from "react"
+import { Heart } from "lucide-react"
 
 import { ContextMenuDemo, ReactionDemo } from "@/demo/basic-demos"
 import { CodeBlock } from "@/demo/code-block"
+import { GitHubLink } from "@/demo/github-link"
 import { Guide } from "@/demo/guide"
+import { MaximalistDemo } from "@/demo/maximalist-demo"
 import { RoomDemo } from "@/demo/room-demo"
+import { ThemeToggle } from "@/demo/theme-toggle"
+import { VideoDemo } from "@/demo/video-demo"
+import { cn } from "@/lib/utils"
 
 const KEYS: Array<[string, string]> = [
   ["Enter / Space", "Open from a press trigger. Select the highlighted item."],
@@ -17,9 +23,9 @@ const KEYS: Array<[string, string]> = [
 
 const NAV = [
   { href: "#demo", label: "Demo" },
-  { href: "#how-it-works", label: "How it works" },
   { href: "#examples", label: "Examples" },
   { href: "#keyboard", label: "Keyboard" },
+  { href: "#how-it-works", label: "How it works" },
 ]
 
 export function App() {
@@ -34,13 +40,19 @@ export function App() {
 
       <main id="main" className="mx-auto max-w-5xl space-y-20 px-4 py-12 sm:px-6 sm:py-16">
         <header className="space-y-6">
-          <p className="text-sm font-medium text-muted-foreground">shadcn/ui registry component</p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-muted-foreground">shadcn/ui registry component</p>
+            <div className="flex items-center gap-2">
+              <GitHubLink />
+              <ThemeToggle />
+            </div>
+          </div>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Pie Menu</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
             A radial menu for React, in the tradition of Don Hopkins&apos; pie menus. Every item is one short flick
             away. Press, drag toward an option, and let go. After a while, you do not need to look.
           </p>
-          <CodeBlock code="npx shadcn@latest add https://your-host/r/pie-menu.json" className="max-w-xl" />
+          <CodeBlock code="npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json" className="max-w-xl" />
           <nav aria-label="On this page">
             <ul className="flex flex-wrap gap-2">
               {NAV.map(({ href, label }) => (
@@ -55,6 +67,7 @@ export function App() {
               ))}
             </ul>
           </nav>
+          <VideoDemo />
         </header>
 
         <Section
@@ -65,21 +78,20 @@ export function App() {
           <RoomDemo />
         </Section>
 
-        <Section
-          id="how-it-works"
-          title="How it works"
-          description="Everything a developer needs to know, in nine short steps."
-        >
-          <Guide />
-        </Section>
-
-        <Section id="examples" title="More examples" description="The same component with different settings.">
+        <Section id="examples" title="More examples" description="The same component with different settings and styles.">
           <div className="grid gap-10 md:grid-cols-2">
             <SubSection title="Context menu" description='openOn="contextmenu". It works with right click, long press, and Shift+F10.'>
               <ContextMenuDemo />
             </SubSection>
             <SubSection title="Icon only" description='openOn="press", a small radius, and an aria-label on each item.'>
               <ReactionDemo />
+            </SubSection>
+            <SubSection
+              className="md:col-span-2"
+              title="Maximalist"
+              description="The headless primitive with its own CSS and no shadcn/ui styles. Same logic, same keyboard support, totally different look."
+            >
+              <MaximalistDemo />
             </SubSection>
           </div>
         </Section>
@@ -101,9 +113,39 @@ export function App() {
           </div>
         </Section>
 
-        <footer className="border-t pt-8 text-sm text-muted-foreground">
-          Based on the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986), and
-          the marking menus of Gordon Kurtenbach and Bill Buxton.
+        <Section
+          id="how-it-works"
+          title="How it works"
+          description="Everything a developer needs to know, in nine short steps."
+        >
+          <Guide />
+        </Section>
+
+        <footer className="flex flex-col gap-6 border-t pt-8 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <p>
+              Based on the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (University of Maryland, 1986),
+              and the marking menus of Gordon Kurtenbach and Bill Buxton.
+            </p>
+            <p>
+              Made with{" "}
+              <Heart
+                aria-hidden="true"
+                className="inline size-4 fill-red-500 align-[-0.125em] text-red-500 dark:fill-red-400 dark:text-red-400"
+              />
+              <span className="sr-only">love</span> by{" "}
+              <a
+                href="https://jpmarqu.es"
+                className="rounded-sm font-medium text-foreground underline underline-offset-4 outline-none hover:text-foreground/80 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              >
+                jpmarqu.es
+              </a>
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 self-start">
+            <GitHubLink />
+            <ThemeToggle />
+          </div>
         </footer>
       </main>
     </>
@@ -124,9 +166,19 @@ function Section({ id, title, description, children }: { id: string; title: stri
   )
 }
 
-function SubSection({ title, description, children }: { title: string; description: string; children: ReactNode }) {
+function SubSection({
+  title,
+  description,
+  className,
+  children,
+}: {
+  title: string
+  description: string
+  className?: string
+  children: ReactNode
+}) {
   return (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", className)}>
       <div className="space-y-1">
         <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
