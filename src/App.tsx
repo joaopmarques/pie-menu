@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { Analytics } from "@vercel/analytics/react"
 import { Heart } from "lucide-react"
 
 import { ContextMenuDemo, ReactionDemo } from "@/demo/basic-demos"
@@ -148,6 +149,7 @@ export function App() {
           </div>
         </footer>
       </main>
+      <Analytics />
     </>
   )
 }
