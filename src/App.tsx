@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { Analytics } from "@vercel/analytics/react"
 import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -189,6 +190,7 @@ export function App() {
           </div>
         </footer>
       </main>
+      <Analytics />
     </>
   )
 }
