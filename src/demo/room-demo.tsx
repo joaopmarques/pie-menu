@@ -122,7 +122,7 @@ export function RoomDemo() {
   )
 }
 
-function ActionPieContent({
+export function ActionPieContent({
   actions,
   onChoose,
 }: {
@@ -149,7 +149,13 @@ function ActionPieContent({
   )
 }
 
-function ObjectTile({ icon: Icon, name }: { icon: LucideIcon; name: string }) {
+export function ObjectTile({
+  icon: Icon,
+  name,
+}: {
+  icon: LucideIcon
+  name: string
+}) {
   return (
     <span className="flex flex-col items-center gap-1.5">
       <span
@@ -272,7 +278,7 @@ function ActionQueue({
   )
 }
 
-function Wallpaper() {
+export function Wallpaper() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
       <div className="absolute inset-x-0 top-0 h-[52%] bg-muted/60 bg-[repeating-linear-gradient(90deg,transparent_0_26px,color-mix(in_oklch,var(--foreground)_4%,transparent)_26px_52px)]" />

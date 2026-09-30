@@ -14,6 +14,7 @@
     "registry:build": "shadcn build",
     "media:og": "node media/og/render.mjs",
     "media:video": "node media/video/record.mjs",
+    "media:video:life-sim": "node media/video/record-life-sim.mjs",
     "lint": "eslint . --cache --cache-location .eslintcache",
     "lint:fix": "eslint --fix . --cache --cache-location .eslintcache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,mjs}\" --cache",

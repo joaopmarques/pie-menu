@@ -1,20 +1,33 @@
 # Pie Menu demo video
 
-This folder makes a short demo video of the pie menu for social media. The video shows the real component with the same items as `ContextMenuDemo` in `src/demo/basic-demos.tsx`.
+This folder makes short demo videos of the pie menu for social media. Both videos show the real components.
+
+| Scene | Output | Contents |
+| --- | --- | --- |
+| Clipboard | 1920 x 1080 (16:9), 120 fps and 60 fps | The same items as `ContextMenuDemo` in `src/demo/basic-demos.tsx`. |
+| Life-sim | 1080 x 1350 (4:5), 60 fps | The fridge from the life-sim room, with the character's head at the center. 4:5 fills the most of the LinkedIn and Bluesky mobile feeds. |
 
 ## Files
 
 | File | Contents |
 | --- | --- |
-| `index.html` | The recording page. |
-| `main.tsx` | The page entry. It renders the menu, a drawn cursor, and a toast. |
+| `recorder.mjs` | The shared engine: virtual time, frame capture, encoding, and motion helpers. |
+| `scene-parts.tsx` | The shared page parts: the drawn cursor and the toast. |
 | `video.css` | Styles for the cursor, the press ring, and the toast. |
-| `record.mjs` | The capture script. It writes the frames and encodes the videos. |
+| `index.html`, `main.tsx` | The clipboard scene page. |
+| `record.mjs` | The clipboard choreography. |
+| `life-sim.html`, `life-sim.tsx` | The life-sim scene page. It uses `ActionPieContent`, `ObjectTile`, and `Wallpaper` from `src/demo/room-demo.tsx`. |
+| `record-life-sim.mjs` | The life-sim choreography. |
+
+To add a scene, write a page that renders `Cursor` from `scene-parts.tsx`, and a script that calls `recordScene` with a `pointer(t)` and a `pressed(t)` function.
 
 The script writes these files:
 
 - `public/media/pie-menu-demo-120fps.mp4`: H.264, 1920 x 1080, 120 fps.
 - `public/media/pie-menu-demo-60fps.mp4`: the same video at 60 fps. It keeps every second frame. It does not blend frames.
+- `public/media/pie-menu-life-sim-1080x1350.mp4`: the life-sim scene, H.264, 1080 x 1350, 60 fps.
+
+For the life-sim scene, run `pnpm media:video:life-sim` instead of `record.mjs`. The dev server step is the same.
 
 ## Record the video
 

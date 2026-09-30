@@ -193,6 +193,8 @@ Check the facts against the code, not against other docs. The prop names live in
 ## Media
 
 - `public/og.png` is 1200x630. It renders from real code in `media/og/`. Render it again when the domain, the tagline, or the component look changes. The script accepts `OG_URL`.
+- A second video, `public/media/pie-menu-life-sim-1080x1350.mp4`, is 4:5 portrait at 60 fps, for the LinkedIn and Bluesky feeds. It shows the fridge pie from the life-sim room. Record it with `pnpm media:video:life-sim`. Keep its viewport at 540 x 675 CSS px: at that width, the pie fits without a viewport shift, so the head stays centered.
+- The recorders share an engine in `media/video/recorder.mjs`. A new scene needs a page and a choreography script only.
 - The GitHub README shows `public/media/pie-menu-demo.webp`, an animated WebP made from the 60 fps video. GitHub only plays `<video>` for files uploaded through its web editor, so the README uses an image. Make it again after every new recording, with the command in `media/video/README.md`.
 - The videos in `public/media/` are 1920x1080 at 120 fps and 60 fps, 8 seconds long, and they loop. The 60 fps copy is for X and LinkedIn, which cap playback at 60 fps. The poster is `public/media/pie-menu-demo-poster.jpg`.
 - The recorder uses a virtual clock:
