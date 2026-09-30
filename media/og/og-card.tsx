@@ -55,7 +55,7 @@ export function OgCard() {
         </p>
         <div className="mt-7 inline-flex w-fit items-center gap-2 rounded-lg border bg-muted px-3 py-2 font-mono text-[13px] text-foreground">
           <span className="text-muted-foreground">$</span>
-          npx shadcn add …/r/pie-menu.json
+          npx shadcn add @jpmarques/pie-menu
         </div>
       </div>
 

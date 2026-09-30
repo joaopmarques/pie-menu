@@ -71,7 +71,7 @@ export function App() {
             <AgentSetupButton className="sm:self-stretch" />
             <em className="text-center text-sm text-muted-foreground">or</em>
             <CodeBlock
-              code="npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json"
+              code="npx shadcn@latest add @jpmarques/pie-menu"
               className="min-w-0 flex-1"
             />
           </div>

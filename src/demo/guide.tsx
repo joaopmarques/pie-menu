@@ -10,8 +10,7 @@ import {
 
 import { CodeBlock } from "./code-block"
 
-const INSTALL =
-  "npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json"
+const INSTALL = "npx shadcn@latest add @jpmarques/pie-menu"
 
 const BASIC_USAGE = `<PieMenu>
   <PieMenuTrigger>Edit</PieMenuTrigger>

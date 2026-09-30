@@ -8,7 +8,7 @@ Pie Menu is a radial menu component for React. It ships as a shadcn/ui registry 
 
 - Author: João P. Marques (https://jpmarqu.es).
 - Repository: https://github.com/joaopmarques/pie-menu (public). Its GitHub website field points to the landing page.
-- Install command for users: `npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json`.
+- Install command for users: `npx shadcn@latest add @jpmarques/pie-menu`. The `@jpmarques` namespace is listed in the shadcn/ui registry directory (added in shadcn-ui/ui#12059). The full URL, `npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json`, also works. A future component under this namespace installs as `@jpmarques/<name>`.
 - The design follows the pie menus of Don Hopkins, Jack Callahan, and Mark Weiser (1986), and the marking menus of Gordon Kurtenbach and Bill Buxton.
 
 ## Requirements and stack

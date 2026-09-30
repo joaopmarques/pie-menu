@@ -19,6 +19,12 @@ A radial menu for React in the shadcn/ui style. Items sit in a ring around the p
 The component needs React 19 and Tailwind CSS v4. Run this command in any shadcn/ui project:
 
 ```bash
+npx shadcn@latest add @jpmarques/pie-menu
+```
+
+Pie Menu is listed in the [shadcn/ui registry directory](https://ui.shadcn.com/docs/directory) under the `@jpmarques` namespace, so the short name works with no setup. The full registry URL works too:
+
+```bash
 npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json
 ```
 

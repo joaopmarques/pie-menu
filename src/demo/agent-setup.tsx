@@ -11,7 +11,7 @@ export const AGENT_SETUP_PROMPT = `Set up the Pie Menu component in this project
 Pie Menu is a radial menu for React, shipped as a shadcn/ui registry item. Docs: https://piemenu.jpmarqu.es/llms-full.txt
 
 1. Check the requirements. The project must use React 19, Tailwind CSS v4, and shadcn/ui (a components.json file). If one is missing, stop and tell me what to change.
-2. Install it: npx shadcn@latest add https://piemenu.jpmarqu.es/r/pie-menu.json
+2. Install it: npx shadcn@latest add @jpmarques/pie-menu
 3. Read the docs above before you write code. Use only the parts and props that they list.
 4. Find one place in the app where a pie menu helps, such as a context menu or a group of related actions. If no place is clear, ask me.
 5. Add a menu there with PieMenu, PieMenuTrigger, PieMenuContent, PieMenuItem, and PieMenuIndicator. Use the icons and actions that the app already has.
